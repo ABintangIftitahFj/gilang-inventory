@@ -2,3 +2,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom style untuk halaman produk */
+.product-card {
+    @apply bg-white rounded-xl shadow p-4 flex flex-col gap-2 border border-gray-100 transition hover:shadow-lg;
+}
+.product-card:hover {
+    @apply ring-2 ring-indigo-200;
+}
+
+/* Status Badge */
+.status-badge {
+    @apply inline-block px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 transition;
+}
+.status-badge[data-status="aktif"] {
+    @apply bg-green-100 text-green-700;
+}
+.status-badge[data-status="nonaktif"] {
+    @apply bg-red-100 text-red-700;
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    background: #f1f1f1;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a0aec0;
+}
+
+/* Animasi modal */
+@keyframes slideIn {
+    0% { transform: translateY(40px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}

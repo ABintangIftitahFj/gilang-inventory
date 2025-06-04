@@ -6,6 +6,7 @@
     <title>Gilang Inventory</title>
 
     @vite('resources/css/app.css')
+    @stack('styles')
 </head>
 <body class="bg-gray-50">
     <nav class="bg-white shadow p-4 mb-6">
@@ -20,5 +21,6 @@
     </main>
 
     @vite('resources/js/app.js')
+    @stack('scripts')
 </body>
 </html>

@@ -233,26 +233,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Show toast notification
     setTimeout(() => {
         const toast = document.getElementById('toast');
-        toast.classList.remove('translate-x-full');
-        
-        // Hide toast after 3 seconds
-        setTimeout(() => {
-            toast.classList.add('translate-x-full');
-        }, 3000);
+        if (toast) {
+            toast.classList.remove('translate-x-full');
+            // Hide toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.add('translate-x-full');
+            }, 3000);
+        }
     }, 500);
 
     // Button click handlers (you can replace with actual form submissions)
-    document.querySelector('.bg-gradient-to-r.from-green-500').addEventListener('click', function() {
-        // Redirect to IN transaction form
-        console.log('Redirecting to IN transaction form...');
-        // window.location.href = '/transaction/in/8901234567890';
-    });
-
-    document.querySelector('.bg-gradient-to-r.from-red-500').addEventListener('click', function() {
-        // Redirect to OUT transaction form
-        console.log('Redirecting to OUT transaction form...');
-        // window.location.href = '/transaction/out/8901234567890';
-    });
+    const btnIn = document.querySelector('.bg-gradient-to-r.from-green-500');
+    if (btnIn) {
+        btnIn.addEventListener('click', function() {
+            // Redirect to IN transaction form
+            console.log('Redirecting to IN transaction form...');
+            // window.location.href = '/transaction/in/8901234567890';
+        });
+    }
+    const btnOut = document.querySelector('.bg-gradient-to-r.from-red-500');
+    if (btnOut) {
+        btnOut.addEventListener('click', function() {
+            // Redirect to OUT transaction form
+            console.log('Redirecting to OUT transaction form...');
+            // window.location.href = '/transaction/out/8901234567890';
+        });
+    }
 });
 </script>
 @endsection

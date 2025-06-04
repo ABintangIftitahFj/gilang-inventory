@@ -10,6 +10,11 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
+Route::get('/scan', function () {
+    return view('scan');
+});
+
+
 Route::get('/section/product', function () {
     return view('section.product');
 })->name('section.product');

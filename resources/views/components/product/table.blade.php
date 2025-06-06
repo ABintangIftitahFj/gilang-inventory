@@ -1,35 +1,26 @@
 <div class="block lg:hidden space-y-4" id="mobileProductList">
-    <!-- Card produk dummy -->
+    <!-- Card produk dari database -->
+    @forelse($products as $product)
     <div class="product-card">
         <div class="flex justify-between items-center">
             <div>
-                <div class="font-bold text-lg">Pulpen Gel</div>
-                <div class="text-xs text-gray-500">Barcode: 1234567890</div>
-                <div class="text-xs text-gray-500">Grade: A</div>
-                <div class="text-xs text-gray-500">Supplier: Toko ATK</div>
-                <span class="status-badge" data-status="aktif">Aktif</span>
+                <div class="font-bold text-lg">{{ $product->product_name }}</div>
+                <div class="text-xs text-gray-500">Barcode: {{ $product->barcode }}</div>
+                <div class="text-xs text-gray-500">Grade: {{ $product->grade }}</div>
+                <div class="text-xs text-gray-500">Supplier: {{ $product->supplier }}</div>
+                <span class="status-badge" data-status="{{ $product->status == 'in_stock' ? 'aktif' : 'nonaktif' }}">
+                    {{ $product->status == 'in_stock' ? 'Aktif' : 'Nonaktif' }}
+                </span>
             </div>
             <div class="flex flex-col gap-1">
-                <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">Edit</button>
-                <button class="text-red-600 hover:text-red-800 font-semibold text-xs">Hapus</button>
+                <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs editProductBtn" data-id="{{ $product->id }}">Edit</button>
+                <button class="text-red-600 hover:text-red-800 font-semibold text-xs deleteProductBtn" data-id="{{ $product->id }}">Hapus</button>
             </div>
         </div>
     </div>
-    <div class="product-card">
-        <div class="flex justify-between items-center">
-            <div>
-                <div class="font-bold text-lg">Buku Tulis</div>
-                <div class="text-xs text-gray-500">Barcode: 9876543210</div>
-                <div class="text-xs text-gray-500">Grade: B</div>
-                <div class="text-xs text-gray-500">Supplier: Gramedia</div>
-                <span class="status-badge" data-status="nonaktif">Nonaktif</span>
-            </div>
-            <div class="flex flex-col gap-1">
-                <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs">Edit</button>
-                <button class="text-red-600 hover:text-red-800 font-semibold text-xs">Hapus</button>
-            </div>
-        </div>
-    </div>
+    @empty
+    <div class="text-center text-gray-500 py-4">Tidak ada produk tersedia</div>
+    @endforelse
 </div>
 
 <div class="hidden lg:block overflow-hidden bg-white rounded-2xl shadow-xl border border-gray-100">
@@ -45,29 +36,28 @@
             </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200" id="productTableBody">
-            <!-- Data produk dummy -->
+            <!-- Data produk dari database -->
+            @forelse($products as $product)
             <tr>
-                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Pulpen Gel</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">1234567890</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">A</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">Toko ATK</td>
-                <td class="px-6 py-4 whitespace-nowrap"><span class="status-badge" data-status="aktif">Aktif</span></td>
+                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $product->product_name }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->barcode }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->grade }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->supplier }}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="status-badge" data-status="{{ $product->status == 'in_stock' ? 'aktif' : 'nonaktif' }}">
+                        {{ $product->status == 'in_stock' ? 'Aktif' : 'Nonaktif' }}
+                    </span>
+                </td>
                 <td class="px-6 py-4 whitespace-nowrap flex gap-2">
-                    <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs editProductBtn" data-id="1">Edit</button>
-                    <button class="text-red-600 hover:text-red-800 font-semibold text-xs deleteProductBtn" data-id="1">Hapus</button>
+                    <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs editProductBtn" data-id="{{ $product->id }}">Edit</button>
+                    <button class="text-red-600 hover:text-red-800 font-semibold text-xs deleteProductBtn" data-id="{{ $product->id }}">Hapus</button>
                 </td>
             </tr>
+            @empty
             <tr>
-                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">Buku Tulis</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">9876543210</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">B</td>
-                <td class="px-6 py-4 whitespace-nowrap text-gray-700">Gramedia</td>
-                <td class="px-6 py-4 whitespace-nowrap"><span class="status-badge" data-status="nonaktif">Nonaktif</span></td>
-                <td class="px-6 py-4 whitespace-nowrap flex gap-2">
-                    <button class="text-indigo-600 hover:text-indigo-800 font-semibold text-xs editProductBtn" data-id="2">Edit</button>
-                    <button class="text-red-600 hover:text-red-800 font-semibold text-xs deleteProductBtn" data-id="2">Hapus</button>
-                </td>
+                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada produk tersedia</td>
             </tr>
+            @endforelse
         </tbody>
     </table>
 </div>

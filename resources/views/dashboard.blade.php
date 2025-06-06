@@ -28,9 +28,11 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Total Produk</p>
-                        <p class="text-3xl font-bold text-gray-900">120</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ $totalProduk }}</p>
                         <div class="flex items-center mt-2">
-                            <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">+12% dari bulan lalu</span>
+                            <span class="text-xs {{ $persentasePerubahan >= 0 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }} px-2 py-1 rounded-full">
+                                {{ $persentasePerubahan >= 0 ? '+' : '' }}{{ $persentasePerubahan }}% dari bulan lalu
+                            </span>
                         </div>
                     </div>
                     <div class="p-3 bg-blue-100 rounded-2xl group-hover:bg-blue-200 transition-colors duration-300">
@@ -46,12 +48,12 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Stok Tersedia</p>
-                        <p class="text-3xl font-bold text-gray-900">95</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ $stokTersedia }}</p>
                         <div class="flex items-center mt-2">
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: 79.2%"></div>
+                                <div class="bg-green-500 h-2 rounded-full" style="width: {{ $persentaseStok }}%"></div>
                             </div>
-                            <span class="text-xs text-gray-500 ml-2">79%</span>
+                            <span class="text-xs text-gray-500 ml-2">{{ $persentaseStok }}%</span>
                         </div>
                     </div>
                     <div class="p-3 bg-green-100 rounded-2xl group-hover:bg-green-200 transition-colors duration-300">
@@ -67,9 +69,13 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600 mb-1">Stok Habis</p>
-                        <p class="text-3xl font-bold text-gray-900">25</p>
+                        <p class="text-3xl font-bold text-gray-900">{{ $stokHabis }}</p>
                         <div class="flex items-center mt-2">
-                            <span class="text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full">Perlu restock!</span>
+                            @if($stokHabis > 0)
+                                <span class="text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full">Perlu restock!</span>
+                            @else
+                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Stok aman</span>
+                            @endif
                         </div>
                     </div>
                     <div class="p-3 bg-red-100 rounded-2xl group-hover:bg-red-200 transition-colors duration-300">
@@ -137,8 +143,8 @@
                                     </svg>
                                 </div>
                             </div>
-                            <p class="text-2xl font-bold text-blue-900 mb-1">15</p>
-                            <p class="text-xs text-blue-700">+3 dari kemarin</p>
+                            <p class="text-2xl font-bold text-blue-900 mb-1">{{ $transaksiMasukHariIni }}</p>
+                            <p class="text-xs text-blue-700">{{ $selisihMasuk >= 0 ? '+' : '' }}{{ $selisihMasuk }} dari kemarin</p>
                         </div>
                         <div class="group bg-gradient-to-br from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200 rounded-xl p-6 transition-all duration-300 border border-pink-200">
                             <div class="flex items-center justify-between mb-2">
@@ -149,8 +155,8 @@
                                     </svg>
                                 </div>
                             </div>
-                            <p class="text-2xl font-bold text-pink-900 mb-1">8</p>
-                            <p class="text-xs text-pink-700">-2 dari kemarin</p>
+                            <p class="text-2xl font-bold text-pink-900 mb-1">{{ $transaksiKeluarHariIni }}</p>
+                            <p class="text-xs text-pink-700">{{ $selisihKeluar >= 0 ? '+' : '' }}{{ $selisihKeluar }} dari kemarin</p>
                         </div>
                     </div>
                 </div>
@@ -179,108 +185,51 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse($transaksiTerakhir as $transaksi)
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-04</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $transaksi->product && $transaksi->product->date_received ? date('Y-m-d', strtotime($transaksi->product->date_received)) : '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Pulpen Gel</div>
-                                <div class="text-sm text-gray-500">SKU: PG001</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $transaksi->product ? $transaksi->product->product_name : 'Produk tidak tersedia' }}</div>
+                                <div class="text-sm text-gray-500">{{ $transaksi->barcode ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
+                                @if($transaksi->transaction_type == 'IN')
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
                                     </svg>
                                     IN
                                 </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">+50</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Selesai</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-03</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Kertas A4</div>
-                                <div class="text-sm text-gray-500">SKU: KA4001</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
+                                @else
                                 <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
                                     </svg>
                                     OUT
                                 </span>
+                                @endif
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">-20</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Selesai</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-03</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Spidol Whiteboard</div>
-                                <div class="text-sm text-gray-500">SKU: SW001</div>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                {{ $transaksi->transaction_type == 'IN' ? '+' : '-' }}{{ $transaksi->quantity ?? 0 }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                                    </svg>
-                                    IN
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    {{ $transaksi->notes ?? 'Selesai' }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">+30</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Pending</span>
-                            </td>
                         </tr>
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-02</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Buku Tulis</div>
-                                <div class="text-sm text-gray-500">SKU: BT001</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-                                    </svg>
-                                    OUT
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">-15</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Selesai</span>
-                            </td>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Belum ada transaksi</td>
                         </tr>
-                        <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2025-06-02</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">Penghapus</div>
-                                <div class="text-sm text-gray-500">SKU: PH001</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                                    </svg>
-                                    IN
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">+100</td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Selesai</span>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             <div class="px-6 py-4 bg-gray-50 border-t border-gray-200">
                 <div class="flex items-center justify-between">
-                    <p class="text-sm text-gray-700">Menampilkan 5 dari 157 transaksi</p>
-                    <a href="#" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200">Lihat semua →</a>
+                    <p class="text-sm text-gray-700">Menampilkan {{ $transaksiTerakhir->count() }} dari {{ $totalTransaksi }} transaksi</p>
+                    <a href="{{ route('inventory.activity') }}" class="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200">Lihat semua →</a>
                 </div>
             </div>
         </div>

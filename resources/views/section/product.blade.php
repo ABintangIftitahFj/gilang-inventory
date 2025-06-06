@@ -11,7 +11,7 @@
     </div>
 
     <!-- Table & Card Produk -->
-    <x-product.table />
+    <x-product.table :products="$products" />
 
     <!-- Modal Create/Edit -->
     <x-product.modal-form />

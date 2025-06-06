@@ -32,19 +32,15 @@ Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout'])->
 // Protected routes (authentication required)
 Route::middleware(['auth'])->group(function () {
     // Dashboard route
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
 
     // Barcode scanning route
     Route::get('/scan', function () {
         return view('scan');
     })->name('scan');
 
-    // Section views
-    Route::get('/section/product', function () {
-        return view('section.product');
-    })->name('section.product');
+    // Section views - sekarang mendapatkan data dari controller
+    Route::get('/section/product', [ProductController::class, 'index'])->name('section.product');
 
     // Inventory Management routes - protected with inventory.access middleware
     Route::middleware([App\Http\Middleware\InventoryAccess::class])->prefix('inventory')->group(function () {

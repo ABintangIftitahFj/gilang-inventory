@@ -14,3 +14,10 @@ Route::get('/dashboard', function () {
 Route::get('/scan', function () {
     return view('scan');
 });
+
+Route::get('/section/product', function () {
+    return view('section.product');
+})->name('section.product');
+// web.php
+
+Route::get('/products/{id}/edit', [ProductController::class, 'edit']);

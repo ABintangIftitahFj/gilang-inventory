@@ -6,10 +6,14 @@
             <div>
                 <div class="font-bold text-lg">{{ $product->product_name }}</div>
                 <div class="text-xs text-gray-500">Barcode: {{ $product->barcode }}</div>
+                <div class="text-xs text-gray-500">Dimensi: {{ $product->panjang }}x{{ $product->lebar }} cm</div>
+                <div class="text-xs text-gray-500">Berat: {{ $product->berat }} gram</div>
                 <div class="text-xs text-gray-500">Grade: {{ $product->grade }}</div>
                 <div class="text-xs text-gray-500">Supplier: {{ $product->supplier }}</div>
+                <div class="text-xs text-gray-500">Lokasi: {{ $product->location }}</div>
+                <div class="text-xs text-gray-500">Tanggal Terima: {{ $product->date_received }}</div>
                 <span class="status-badge" data-status="{{ $product->status == 'in_stock' ? 'aktif' : 'nonaktif' }}">
-                    {{ $product->status == 'in_stock' ? 'Aktif' : 'Nonaktif' }}
+                    {{ $product->status == 'in_stock' ? 'In Stock' : 'Out Of Stock' }}
                 </span>
             </div>
             <div class="flex flex-col gap-1">
@@ -29,8 +33,12 @@
             <tr>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Barcode</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Dimensi (PxL)</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Berat</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Grade</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Supplier</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Lokasi</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tanggal Terima</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Aksi</th>
             </tr>
@@ -41,8 +49,12 @@
             <tr>
                 <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ $product->product_name }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->barcode }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->panjang }}x{{ $product->lebar }} cm</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->berat }} gram</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->grade }}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->supplier }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->location }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-gray-700">{{ $product->date_received }}</td>
                 <td class="px-6 py-4 whitespace-nowrap">
                     <span class="status-badge" data-status="{{ $product->status == 'in_stock' ? 'aktif' : 'nonaktif' }}">
                         {{ $product->status == 'in_stock' ? 'Aktif' : 'Nonaktif' }}
@@ -55,7 +67,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="px-6 py-4 text-center text-gray-500">Tidak ada produk tersedia</td>
+                <td colspan="10" class="px-6 py-4 text-center text-gray-500">Tidak ada produk tersedia</td>
             </tr>
             @endforelse
         </tbody>

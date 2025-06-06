@@ -16,7 +16,7 @@
 </head>
 <body class="min-h-screen bg-gray-50">
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
+        <!-- Sidebar -->`
         <aside class="hidden lg:flex lg:flex-shrink-0">
             <div class="flex flex-col w-64 border-r border-gray-200 bg-white">
                 <div class="h-0 flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
@@ -39,7 +39,7 @@
                                 Manajemen Produk
                             </h3>
                             <div class="mt-1 space-y-1">
-                                <a href="{{ route('products.index') }}" class="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-blue-600">
+                                <a href="#" class="group flex items-center px-2 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-blue-600">
                                     <svg class="mr-3 h-6 w-6 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
                                     </svg>
@@ -222,5 +222,8 @@
             }
         });
     </script>
+    
+    <!-- Stack for page-specific scripts -->
+    @stack('scripts')
 </body>
 </html>

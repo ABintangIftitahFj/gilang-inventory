@@ -41,6 +41,14 @@ Route::middleware(['auth'])->group(function () {
 
     // Section views - sekarang mendapatkan data dari controller
     Route::get('/section/product', [ProductController::class, 'index'])->name('section.product');
+    
+    // AJAX route untuk mengambil data produk (dengan prefix api)
+    Route::prefix('api')->group(function () {
+        Route::get('/products/{product}', [ProductController::class, 'apiShow'])->name('api.products.get');
+        Route::post('/products', [ProductController::class, 'apiStore'])->name('api.products.store');
+        Route::put('/products/{product}', [ProductController::class, 'apiUpdate'])->name('api.products.update');
+        Route::delete('/products/{product}', [ProductController::class, 'apiDestroy'])->name('api.products.delete');
+    });
 
     // Inventory Management routes - protected with inventory.access middleware
     Route::middleware([App\Http\Middleware\InventoryAccess::class])->prefix('inventory')->group(function () {

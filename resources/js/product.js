@@ -87,8 +87,21 @@ document.addEventListener('DOMContentLoaded', function () {
     window.showToast = function(message, type = 'success') {
         toastMessage.textContent = message;
         toast.classList.remove('hidden');
+        
+        // Optional: Change toast color based on type
+        if (type === 'success') {
+            toast.classList.add('text-green-500');
+            toast.classList.remove('text-red-500', 'text-yellow-500');
+        } else if (type === 'error') {
+            toast.classList.add('text-red-500');
+            toast.classList.remove('text-green-500', 'text-yellow-500');
+        } else if (type === 'warning') {
+            toast.classList.add('text-yellow-500');
+            toast.classList.remove('text-green-500', 'text-red-500');
+        }
+        
         setTimeout(() => {
             toast.classList.add('hidden');
-        }, 2000);
+        }, 3000);
     };
 });

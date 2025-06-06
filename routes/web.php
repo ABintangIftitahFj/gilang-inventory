@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 // Public routes (no authentication required)
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('dashboard');
 })->name('welcome');
 
 // Authentication routes

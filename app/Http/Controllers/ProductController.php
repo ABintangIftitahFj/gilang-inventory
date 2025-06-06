@@ -58,7 +58,17 @@ class ProductController extends Controller
                 ->withInput();
         }
 
-        Product::create($request->all());
+        // Buat produk baru
+        $product = Product::create($request->all());
+
+        // Buat transaksi masuk otomatis saat produk baru ditambahkan
+        $product->transactions()->create([
+            'barcode' => $product->barcode,
+            'transaction_type' => 'IN',
+            'quantity' => 1,
+            'user_name' => auth()->user()->name ?? 'System',
+            'notes' => 'Produk baru ditambahkan'
+        ]);
 
         return redirect()
             ->route('products.index')

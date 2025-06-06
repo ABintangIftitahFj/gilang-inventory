@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Middleware\AdminAccess;
+use App\Http\Middleware\InventoryAccess;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -45,7 +47,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('section.product');
 
     // Inventory Management routes - protected with inventory.access middleware
-    Route::middleware(['inventory.access'])->prefix('inventory')->group(function () {
+    Route::middleware([App\Http\Middleware\InventoryAccess::class])->prefix('inventory')->group(function () {
         // Product routes
         Route::resource('products', ProductController::class);
 
@@ -58,7 +60,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Admin-only routes
-    Route::middleware(['admin.access'])->prefix('admin')->group(function () {
+    Route::middleware([App\Http\Middleware\AdminAccess::class])->prefix('admin')->group(function () {
         // User management
         Route::get('/users', function () {
             // This would typically be a UserController method

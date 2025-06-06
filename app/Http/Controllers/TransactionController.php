@@ -185,4 +185,127 @@ class TransactionController extends Controller
             ->route('transactions.index')
             ->with('success', 'Transaction deleted successfully');
     }
+
+    /**
+     * Display transaction activity log.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function activityLog()
+    {
+        $transactions = Transaction::with('product')
+            ->latest()
+            ->paginate(50);
+
+        return view('inventory.activity-log', compact('transactions'));
+    }
+
+    /**
+     * Display a listing of transactions as JSON API response.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiIndex()
+    {
+        $transactions = Transaction::with('product')->latest()->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $transactions
+        ]);
+    }
+
+    /**
+     * Display the specified transaction as JSON API response.
+     *
+     * @param  \App\Models\Transaction  $transaction
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiShow(Transaction $transaction)
+    {
+        $transaction->load('product');
+
+        return response()->json([
+            'success' => true,
+            'data' => $transaction
+        ]);
+    }
+
+    /**
+     * Store a newly created transaction via API.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'product_id' => 'required|exists:products,id',
+            'barcode' => 'required|string|exists:products,barcode',
+            'transaction_type' => 'required|in:IN,OUT',
+            'quantity' => 'required|integer|min:1',
+            'user_name' => 'required|string|max:255',
+            'notes' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        // Create the transaction
+        $transaction = Transaction::create($request->all());
+
+        // Update product status based on transaction
+        $product = Product::find($request->product_id);
+
+        if ($product) {
+            // Logic for updating product status based on transaction type
+            if ($request->transaction_type == 'OUT') {
+                $product->status = 'out_of_stock';
+            } else {
+                $product->status = 'in_stock';
+            }
+            $product->save();
+        }
+
+        $transaction->load('product');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Transaction recorded successfully',
+            'data' => $transaction
+        ], 201);
+    }
+
+    /**
+     * Get activity log for transactions as JSON API response.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function apiActivityLog()
+    {
+        $transactions = Transaction::with('product')
+            ->latest()
+            ->get()
+            ->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'product_name' => $transaction->product->product_name,
+                    'barcode' => $transaction->barcode,
+                    'transaction_type' => $transaction->transaction_type,
+                    'quantity' => $transaction->quantity,
+                    'user_name' => $transaction->user_name,
+                    'notes' => $transaction->notes,
+                    'created_at' => $transaction->created_at->format('Y-m-d H:i:s')
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'data' => $transactions
+        ]);
+    }
 }

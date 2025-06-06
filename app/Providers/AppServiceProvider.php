@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Configure any application services
+        // For Sanctum configuration, use the sanctum.php config file
+        // or .env file to set stateful domains
     }
 }

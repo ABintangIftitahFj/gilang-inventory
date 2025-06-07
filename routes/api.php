@@ -3,34 +3,24 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Api\BarcodeController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-// Use the 'api' middleware globally for all routes in this file
-// This file is already loaded with the 'api' prefix in RouteServiceProvider
-
-/*
- * |--------------------------------------------------------------------------
- * | API Routes
- * |--------------------------------------------------------------------------
- * |
- * | Here is where you can register API routes for your application. These
- * | routes are loaded by the RouteServiceProvider within a group which
- * | is assigned the "api" middleware group. Enjoy building your API!
- * |
- */
 
 // Basic test route - accessible at /api/test
 Route::get('test', function () {
     return response()->json(['message' => 'API is working!']);
 });
 
+// Route for barcode checking - publicly accessible
+Route::post('check-barcode', [BarcodeController::class, 'checkBarcode']);
+
 // API v1 routes grouping
 Route::prefix('v1')->group(function () {
     // Public routes
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
-
+    
     // Protected routes
     Route::middleware('auth:sanctum')->group(function () {
         // Auth routes

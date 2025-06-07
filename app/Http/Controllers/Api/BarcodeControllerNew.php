@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
@@ -8,6 +7,8 @@ use Illuminate\Http\JsonResponse;  // Import JsonResponse untuk type hinting
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+
+// PENTING: Namespace ini mengharuskan file berada di folder app/Http/Controllers/Api/
 
 class BarcodeController extends Controller
 {
@@ -62,5 +63,3 @@ class BarcodeController extends Controller
         }
     }
 }
-
-?>

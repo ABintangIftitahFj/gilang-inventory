@@ -1,53 +1,64 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\Api\BarcodeController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\TransactionController;
 use Illuminate\Support\Facades\Route;
 
-// Basic test route - accessible at /api/test
-Route::get('test', function () {
-    return response()->json(['message' => 'API is working!']);
-});
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Di sinilah Anda mendaftarkan rute API untuk aplikasi Anda.
+|
+*/
 
-// Route for barcode checking - publicly accessible
-Route::post('check-barcode', [BarcodeController::class, 'checkBarcode']);
+// Rute untuk mengecek status API
+Route::get('test', fn () => response()->json(['message' => 'API is working!']));
 
-// API v1 routes grouping
+// --- API Versi 1 ---
 Route::prefix('v1')->group(function () {
-    // Public routes
+    
+    // --- Rute Publik (Tidak perlu login) ---
     Route::post('auth/register', [AuthController::class, 'register']);
     Route::post('auth/login', [AuthController::class, 'login']);
     
-    // Protected routes
+    // Endpoint utama untuk check barcode
+    Route::post('barcode/check', [BarcodeController::class, 'checkBarcode']);
+
+
+    // --- Rute Terproteksi (Wajib login/autentikasi via Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
-        // Auth routes
+        
+        // Rute terkait Autentikasi User
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/user', [AuthController::class, 'user']);
 
-        // Products API
-        Route::prefix('products')->group(function () {
-            Route::get('/', [ProductController::class, 'apiIndex']);
-            Route::post('/', [ProductController::class, 'apiStore']);
-            Route::get('/{product}', [ProductController::class, 'apiShow']);
-            Route::put('/{product}', [ProductController::class, 'apiUpdate']);
-            Route::delete('/{product}', [ProductController::class, 'apiDestroy']);
+        // Rute untuk Resource Products (CRUD)
+        Route::apiResource('products', ProductController::class);
+
+        // Rute untuk Resource Transactions
+        Route::prefix('transactions')->group(function() {
+            Route::get('/', [TransactionController::class, 'index']);
+            Route::post('/', [TransactionController::class, 'store']);
+            Route::get('/{transaction}', [TransactionController::class, 'show']);
         });
 
-        // Transactions API
-        Route::prefix('transactions')->group(function () {
-            Route::get('/', [TransactionController::class, 'apiIndex']);
-            Route::post('/', [TransactionController::class, 'apiStore']);
-            Route::get('/{transaction}', [TransactionController::class, 'apiShow']);
-        });
-
-        // Additional inventory endpoints
+        // Rute tambahan terkait Inventory
         Route::prefix('inventory')->group(function () {
-            Route::get('/stock-levels', [ProductController::class, 'apiStockLevels']);
-            Route::get('/activity-log', [TransactionController::class, 'apiActivityLog']);
-            Route::post('/scan', [ProductController::class, 'apiProcessBarcode']);
+            Route::get('stock-levels', [ProductController::class, 'stockLevels']);
+            Route::get('activity-log', [TransactionController::class, 'activityLog']);
+            
+            // Anda punya 'processBarcode' di sini, mungkin maksudnya berbeda dengan 'checkBarcode'?
+            // Jika fungsinya sama, pertimbangkan untuk menyatukannya.
+            Route::post('scan', [ProductController::class, 'processBarcode']);
         });
     });
 });
+
+
+// --- Rute Legacy (jika masih dibutuhkan untuk kompatibilitas) ---
+// Tempatkan di luar group v1 jika endpoint ini tidak mengikuti standar versi
+Route::post('check-barcode', [BarcodeController::class, 'checkBarcode']);

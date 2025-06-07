@@ -52,8 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Fungsi untuk mengirim barcode ke backend (API Laravel)
     const checkBarcodeInDatabase = async (barcode) => {
         try {
-            // Ubah URL API di sini untuk mengarah ke rute 'check-barcode'
-            const response = await fetch('/api/check-barcode', { // <--- UBAH URL INI
+            // URL API yang benar dengan baseURL yang sesuai dengan aplikasi
+            const baseUrl = window.location.origin; // Mendapatkan base URL dinamis
+            // Gunakan format API yang konsisten
+            console.log(`Sending request to: ${baseUrl}/api/v1/barcode/check`); // Log URL untuk debugging
+            const response = await fetch(`${baseUrl}/api/v1/barcode/check`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -63,7 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ barcode: barcode })
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', [...response.headers.entries()]);
+            
             const data = await response.json();
+            console.log('API Response:', data);
 
             if (data.success) {
                 if (data.status === 'exists') {

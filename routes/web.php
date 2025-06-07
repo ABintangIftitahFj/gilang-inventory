@@ -22,6 +22,9 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('welcome');
 
+// Fallback route untuk API barcode yang mungkin salah rute
+Route::post('/api/v1/barcode/check', [App\Http\Controllers\Api\BarcodeController::class, 'checkBarcode']);
+
 // Authentication routes
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [App\Http\Controllers\AuthController::class, 'login']);
@@ -39,16 +42,15 @@ Route::middleware(['auth'])->group(function () {
         return view('scan');
     })->name('scan');
 
+    // API Test route
+    Route::get('/api-test', function () {
+        return view('api-test');
+    })->name('api.test');
+
     // Section views - sekarang mendapatkan data dari controller
     Route::get('/section/product', [ProductController::class, 'index'])->name('section.product');
-    
-    // AJAX route untuk mengambil data produk (dengan prefix api)
-    Route::prefix('api')->group(function () {
-        Route::get('/products/{product}', [ProductController::class, 'apiShow'])->name('api.products.get');
-        Route::post('/products', [ProductController::class, 'apiStore'])->name('api.products.store');
-        Route::put('/products/{product}', [ProductController::class, 'apiUpdate'])->name('api.products.update');
-        Route::delete('/products/{product}', [ProductController::class, 'apiDestroy'])->name('api.products.delete');
-    });
+
+    // API routes moved to Api/ProductController and defined in api.php
 
     // Inventory Management routes - protected with inventory.access middleware
     Route::middleware([App\Http\Middleware\InventoryAccess::class])->prefix('inventory')->group(function () {

@@ -77,8 +77,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function fetchProductData(id) {
         console.log('Fetching product data for ID:', id);
         
-        // Menggunakan URL API yang baru
-        return fetch(`/api/products/${id}`)
+        // Menggunakan URL API yang benar dengan base URL dinamis
+        const baseUrl = window.location.origin;
+        return fetch(`${baseUrl}/api/v1/products/${id}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -135,7 +136,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Determine if we're creating or updating a product
             const isUpdate = productId.value !== '';
             // Menggunakan URL API yang baru
-            const url = isUpdate ? `/api/products/${productId.value}` : '/api/products';
+            const baseUrl = window.location.origin;
+            const url = isUpdate ? `${baseUrl}/api/v1/products/${productId.value}` : `${baseUrl}/api/v1/products`;
             const method = isUpdate ? 'PUT' : 'POST';
             
             // Send the AJAX request
@@ -256,7 +258,8 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Confirming delete for product ID:', id);
             
             // Send AJAX request to delete product (menggunakan URL API yang baru)
-            fetch(`/api/products/${id}`, {
+            const baseUrl = window.location.origin;
+            fetch(`${baseUrl}/api/v1/products/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')

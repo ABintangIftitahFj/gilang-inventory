@@ -352,4 +352,36 @@ class ProductController extends Controller
             'action' => $request->action
         ]);
     }
+    public function checkBarcodeExistence(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'barcode' => 'required|string|max:255', // Tidak perlu 'exists' di sini
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid barcode format.',
+                'errors' => $validator->errors()
+            ], 400); // Bad Request
+        }
+
+        $barcode = $request->input('barcode');
+        $product = Product::where('barcode', $barcode)->first();
+
+        if ($product) {
+            return response()->json([
+                'success' => true,
+                'status' => 'exists',
+                'message' => 'Barcode sudah ada di database.',
+                'data' => $product // Opsional: kirim data produk jika ditemukan
+            ]);
+        } else {
+            return response()->json([
+                'success' => true,
+                'status' => 'not_exists',
+                'message' => 'Barcode belum ada di database.'
+            ]);
+        }
+    }
 }

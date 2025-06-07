@@ -22,201 +22,78 @@
         <div class="max-w-md mx-auto mb-8">
             <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
                 <!-- Scanner Status -->
-                <div class="p-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white">
+                <div id="scannerStatus" class="p-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white">
                     <div class="flex items-center justify-center space-x-2">
                         <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path>
                         </svg>
-                        <span class="font-semibold">Scan Berhasil!</span>
+                        <span class="font-semibold">Siap untuk scan</span>
                     </div>
                 </div>
 
                 <!-- Scanner Preview Area -->
-                <div class="relative bg-gray-900 aspect-square flex items-center justify-center">
-                    <div class="absolute inset-4 border-2 border-white rounded-lg opacity-50"></div>
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-green-500/20 to-transparent animate-pulse"></div>
-                    
+                <div id="interactive" class="relative bg-gray-900 aspect-square flex items-center justify-center overflow-hidden">
+                    <div class="absolute inset-4 border-2 border-white rounded-lg opacity-50 z-10 pointer-events-none"></div>
                     <!-- Scanner Line Animation -->
-                    <div class="absolute left-4 right-4 h-0.5 bg-green-400 animate-bounce" style="top: 45%;"></div>
+                    <div class="absolute left-4 right-4 h-0.5 bg-green-400 animate-bounce z-10 pointer-events-none" style="top: 45%;"></div>
                     
-                    <!-- Barcode Visualization -->
-                    <div class="z-10 bg-white p-4 rounded-lg shadow-lg">
-                        <div class="flex space-x-1">
-                            <div class="w-1 h-12 bg-black"></div>
-                            <div class="w-0.5 h-12 bg-black"></div>
-                            <div class="w-1.5 h-12 bg-black"></div>
-                            <div class="w-0.5 h-12 bg-black"></div>
-                            <div class="w-1 h-12 bg-black"></div>
-                            <div class="w-2 h-12 bg-black"></div>
-                            <div class="w-0.5 h-12 bg-black"></div>
-                            <div class="w-1 h-12 bg-black"></div>
-                            <div class="w-1.5 h-12 bg-black"></div>
-                            <div class="w-0.5 h-12 bg-black"></div>
-                        </div>
-                        <p class="text-xs text-center mt-2 font-mono">8901234567890</p>
+                    <!-- Added a container for the video with full width styling -->
+                    <div class="video-container w-full h-full absolute inset-0">
+                        <!-- Camera display will be injected here by Quagga2 -->
                     </div>
                 </div>
 
                 <!-- Scan Result -->
                 <div class="p-4 bg-gray-50">
                     <p class="text-sm text-gray-600 text-center">
-                        <span class="font-semibold text-green-600">Barcode:</span> 8901234567890
+                        <span class="font-semibold text-green-600">Barcode:</span> 
+                        <span id="result">Siap untuk scan</span>
                     </p>
                 </div>
+
+                <!-- Camera Controls -->
+                <div class="p-4 bg-gray-100 border-t border-gray-200">
+                    <div class="flex justify-center space-x-4">
+                        <button id="startButton" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition-all duration-200">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                </svg>
+                                Mulai Kamera
+                            </span>
+                        </button>
+                        <button id="switchCameraButton" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition-all duration-200">
+                            <span class="flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                </svg>
+                                Ganti Kamera
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add New Product Button -->
+            <div class="mt-4 text-center">
+                <button id="addNewProductBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl shadow font-semibold transition-all duration-300 flex items-center gap-2 mx-auto hidden">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Tambah Produk Baru
+                </button>
             </div>
         </div>
 
-        <!-- Product Found - Main Content -->
-        <div class="max-w-4xl mx-auto">
-            <!-- Product Information Card -->
-            <div class="bg-white rounded-2xl shadow-xl border border-gray-200 mb-6 overflow-hidden">
-                <div class="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                    <div class="flex items-center space-x-3">
-                        <div class="p-3 bg-blue-100 rounded-xl">
-                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900">Produk Ditemukan</h2>
-                            <p class="text-gray-600">Informasi produk dari database</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-6">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Basic Info -->
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Nama Produk</span>
-                                <span class="text-sm font-bold text-gray-900 text-right">Pulpen Gel Hitam</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Barcode</span>
-                                <span class="text-sm font-mono text-gray-900">8901234567890</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Supplier</span>
-                                <span class="text-sm text-gray-900">PT. Stationary Indo</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Grade</span>
-                                <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">A</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Lokasi</span>
-                                <span class="text-sm text-gray-900">Rak A-1-2</span>
-                            </div>
-                        </div>
-
-                        <!-- Physical Properties -->
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Dimensi (P×L×T)</span>
-                                <span class="text-sm text-gray-900">15 × 1.2 × 1.2 cm</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Berat</span>
-                                <span class="text-sm text-gray-900">12 gram</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Tanggal Terima</span>
-                                <span class="text-sm text-gray-900">2025-05-15</span>
-                            </div>
-                            <div class="flex justify-between items-start border-b border-gray-100 pb-3">
-                                <span class="text-sm font-medium text-gray-500">Status</span>
-                                <span class="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Active</span>
-                            </div>
-                            <div class="flex justify-between items-start">
-                                <span class="text-sm font-medium text-gray-500">Stok Saat Ini</span>
-                                <span class="text-lg font-bold text-indigo-600">245 pcs</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Notes -->
-                    <div class="mt-6 p-4 bg-gray-50 rounded-xl">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-2">Catatan:</h4>
-                        <p class="text-sm text-gray-600">Pulpen gel dengan tinta berkualitas tinggi, cocok untuk penggunaan sehari-hari. Stok dalam kondisi baik.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Action Selection -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- IN Transaction -->
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden group hover:shadow-2xl transition-all duration-300">
-                    <div class="p-6 bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-100">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-3 bg-green-100 rounded-xl group-hover:bg-green-200 transition-colors duration-300">
-                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-900">Transaksi Masuk</h3>
-                                <p class="text-sm text-gray-600">Tambah stok produk</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-gray-600 mb-6">Gunakan untuk menambahkan stok produk yang baru datang atau hasil return.</p>
-                        <button class="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            <span>Pilih Transaksi IN</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- OUT Transaction -->
-                <div class="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden group hover:shadow-2xl transition-all duration-300">
-                    <div class="p-6 bg-gradient-to-br from-red-50 to-pink-50 border-b border-red-100">
-                        <div class="flex items-center space-x-3">
-                            <div class="p-3 bg-red-100 rounded-xl group-hover:bg-red-200 transition-colors duration-300">
-                                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
-                                </svg>
-                            </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-900">Transaksi Keluar</h3>
-                                <p class="text-sm text-gray-600">Kurangi stok produk</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="p-6">
-                        <p class="text-gray-600 mb-6">Gunakan untuk mencatat pengeluaran stok karena penjualan atau penggunaan internal.</p>
-                        <button class="w-full bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 12H6"></path>
-                            </svg>
-                            <span>Pilih Transaksi OUT</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="flex items-center justify-center space-x-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                    </svg>
-                    <span>Scan Ulang</span>
-                </button>
-                <button class="flex items-center justify-center space-x-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-medium py-3 px-6 rounded-xl transition-colors duration-200">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                    </svg>
-                    <span>Lihat Detail</span>
-                </button>
-            </div>
+        <!-- Product Found Section (Initially Hidden) -->
+        <div id="productFoundSection" class="max-w-4xl mx-auto hidden">
+            <!-- Product information will be dynamically loaded here -->
         </div>
     </div>
 </div>
+
+<!-- Product Form Modal -->
+<x-product.modal-form />
 
 <!-- Toast Notification (Hidden by default) -->
 <div id="toast" class="fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 z-50">
@@ -224,21 +101,56 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
         </svg>
-        <span>Scan berhasil!</span>
+        <span id="toastMessage">Scan berhasil!</span>
     </div>
 </div>
 
+@endsection
+
+@push('scripts')
+<!-- Include QuaggaJS for barcode scanning -->
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.8.2/dist/quagga.min.js"></script>
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+<<<<<<< Updated upstream
     // Show toast notification
     setTimeout(() => {
         const toast = document.getElementById('toast');
         toast.classList.remove('translate-x-full');
+=======
+    const scannerStatus = document.getElementById('scannerStatus');
+    const resultElement = document.getElementById('result');
+    const addNewProductBtn = document.getElementById('addNewProductBtn');
+    const productFoundSection = document.getElementById('productFoundSection');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const startButton = document.getElementById('startButton');
+    const switchCameraButton = document.getElementById('switchCameraButton');
+    
+    // Product form elements
+    const productModal = document.getElementById('productModal');
+    const productBarcode = document.getElementById('productBarcode');
+    const modalTitle = document.getElementById('modalTitle');
+    const productForm = document.getElementById('productForm');
+
+    // Camera variables
+    let activeCamera = 'environment'; // Default to back camera
+    let isScanning = false;
+    
+    // Function to show toast notification
+    function showToast(message, type = 'success') {
+        toastMessage.textContent = message;
+        toast.classList.remove('translate-x-full');
+        toast.classList.remove('bg-green-500', 'bg-red-500');
+        toast.classList.add(type === 'success' ? 'bg-green-500' : 'bg-red-500');
+>>>>>>> Stashed changes
         
         // Hide toast after 3 seconds
         setTimeout(() => {
             toast.classList.add('translate-x-full');
         }, 3000);
+<<<<<<< Updated upstream
     }, 500);
 
     // Button click handlers (you can replace with actual form submissions)
@@ -253,6 +165,324 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Redirecting to OUT transaction form...');
         // window.location.href = '/transaction/out/8901234567890';
     });
+=======
+    }
+    
+    // Function to check if barcode exists in database
+    function checkBarcode(barcode) {
+        return fetch(`/api/products/check-barcode/${barcode}`)
+            .then(response => response.json())
+            .catch(error => {
+                console.error('Error checking barcode:', error);
+                return { exists: false };
+            });
+    }
+    
+    // Get available video devices
+    async function getVideoDevices() {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            return devices.filter(device => device.kind === 'videoinput');
+        } catch (error) {
+            console.error('Error enumerating devices:', error);
+            return [];
+        }
+    }
+    
+    // Initialize Quagga barcode scanner
+    async function initScanner() {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showToast('Browser tidak mendukung akses kamera', 'error');
+            return;
+        }
+        
+        try {
+            // Stop scanner if already running
+            if (isScanning) {
+                await stopScanner();
+            }
+            
+            isScanning = true;
+            scannerStatus.querySelector('span').textContent = 'Memulai kamera...';
+            
+            const videoDevices = await getVideoDevices();
+            console.log('Available video devices:', videoDevices);
+
+            // Configure Quagga
+            await Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('.video-container'),
+                    constraints: {
+                        width: { min: 640 },
+                        height: { min: 480 },
+                        aspectRatio: { min: 1, max: 1 },
+                        facingMode: activeCamera
+                    },
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 2,
+                frequency: 10,
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader",
+                        "ean_8_reader",
+                        "code_39_reader",
+                        "code_39_vin_reader",
+                        "codabar_reader",
+                        "upc_reader",
+                        "upc_e_reader",
+                        "i2of5_reader"
+                    ],
+                    debug: {
+                        showCanvas: true,
+                        showPatches: true,
+                        showFoundPatches: true,
+                        showSkeleton: true,
+                        showLabels: true,
+                        showPatchLabels: true,
+                        showRemainingPatchLabels: true,
+                        boxFromPatches: {
+                            showTransformed: true,
+                            showTransformedBox: true,
+                            showBB: true
+                        }
+                    }
+                },
+            }, function(err) {
+                if (err) {
+                    console.error('Error initializing Quagga:', err);
+                    showToast('Gagal mengaktifkan kamera. Coba izinkan akses di pengaturan browser.', 'error');
+                    isScanning = false;
+                    return;
+                }
+                
+                // Camera is now active, update UI
+                scannerStatus.querySelector('span').textContent = 'Siap untuk scan';
+                startButton.innerHTML = `
+                    <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
+                        </svg>
+                        Stop Kamera
+                    </span>`;
+                
+                // Start scanning
+                Quagga.start();
+                
+                // Make sure video is visible and properly sized
+                setTimeout(() => {
+                    const video = document.querySelector('.video-container video');
+                    if (video) {
+                        video.style.display = 'block';
+                        video.style.width = '100%';
+                        video.style.height = '100%';
+                        video.style.objectFit = 'cover';
+                        
+                        // Add parent styling to ensure video container fills scanner area
+                        const videoContainer = document.querySelector('.video-container');
+                        if (videoContainer) {
+                            videoContainer.style.display = 'flex';
+                            videoContainer.style.justifyContent = 'center';
+                            videoContainer.style.alignItems = 'center';
+                        }
+                    }
+                }, 1000);
+            });
+        } catch (error) {
+            console.error('Failed to initialize scanner:', error);
+            showToast('Gagal mengaktifkan kamera: ' + error.message, 'error');
+            isScanning = false;
+        }
+    }
+    
+    // Function to stop the scanner
+    async function stopScanner() {
+        if (isScanning) {
+            try {
+                await Quagga.stop();
+                isScanning = false;
+                startButton.innerHTML = `
+                    <span class="flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                        Mulai Kamera
+                    </span>`;
+                console.log('Scanner stopped');
+            } catch (error) {
+                console.error('Error stopping scanner:', error);
+            }
+        }
+    }
+    
+    // Start button click handler
+    startButton.addEventListener('click', async function() {
+        if (isScanning) {
+            await stopScanner();
+        } else {
+            await initScanner();
+        }
+    });
+    
+    // Switch camera button
+    switchCameraButton.addEventListener('click', async function() {
+        // Toggle between front and back cameras
+        activeCamera = activeCamera === 'environment' ? 'user' : 'environment';
+        showToast(`Beralih ke kamera ${activeCamera === 'environment' ? 'belakang' : 'depan'}`);
+        
+        // Restart scanner with new camera
+        if (isScanning) {
+            await stopScanner();
+        }
+        await initScanner();
+    });
+
+    // Barcode detection handler
+    Quagga.onDetected(function(result) {
+        if (result && result.codeResult && result.codeResult.code) {
+            const barcode = result.codeResult.code;
+            console.log('Barcode detected:', barcode);
+            
+            // Pause scanner temporarily
+            Quagga.pause();
+            
+            // Update UI
+            resultElement.textContent = barcode;
+            scannerStatus.classList.remove('from-blue-500', 'to-indigo-600');
+            scannerStatus.classList.add('from-green-500', 'to-emerald-600');
+            scannerStatus.querySelector('span').textContent = 'Scan Berhasil!';
+            
+            // Show success toast
+            showToast('Barcode berhasil discan: ' + barcode);
+            
+            // Check if barcode exists in database
+            checkBarcode(barcode).then(response => {
+                if (response.exists) {
+                    // Product exists, show product info
+                    showToast('Produk ditemukan di database!');
+                    // Logic to display product information can be added here
+                } else {
+                    // Product doesn't exist, show add new button
+                    addNewProductBtn.classList.remove('hidden');
+                    
+                    // Remove previous event listeners
+                    const newBtn = addNewProductBtn.cloneNode(true);
+                    addNewProductBtn.parentNode.replaceChild(newBtn, addNewProductBtn);
+                    
+                    // Add new event listener
+                    newBtn.addEventListener('click', function() {
+                        // Reset the form
+                        if (productForm) productForm.reset();
+                        
+                        // Set barcode in form
+                        if (productBarcode) productBarcode.value = barcode;
+                        
+                        // Update modal title
+                        if (modalTitle) modalTitle.textContent = 'Tambah Produk Baru';
+                        
+                        // Show modal
+                        if (productModal) productModal.classList.remove('hidden');
+                    });
+                    
+                    // Update reference
+                    addNewProductBtn = newBtn;
+                }
+            });
+            
+            // Resume scanner after 3 seconds if not adding a product
+            setTimeout(() => {
+                if (!productModal || productModal.classList.contains('hidden')) {
+                    scannerStatus.classList.remove('from-green-500', 'to-emerald-600');
+                    scannerStatus.classList.add('from-blue-500', 'to-indigo-600');
+                    scannerStatus.querySelector('span').textContent = 'Siap untuk scan';
+                    Quagga.resume();
+                }
+            }, 3000);
+        }
+    });
+    
+    // Process error events
+    Quagga.onProcessed(function(result) {
+        const drawingCtx = Quagga.canvas.ctx.overlay;
+        const drawingCanvas = Quagga.canvas.dom.overlay;
+
+        if (result) {
+            // Filter out boxes with low confidence
+            if (result.boxes && result.boxes.length > 0) {
+                drawingCtx.clearRect(0, 0, parseInt(drawingCanvas.getAttribute("width")), parseInt(drawingCanvas.getAttribute("height")));
+                result.boxes.filter(function(box) {
+                    return box !== result.box;
+                }).forEach(function(box) {
+                    Quagga.ImageDebug.drawPath(box, { x: 0, y: 1 }, drawingCtx, { color: "green", lineWidth: 2 });
+                });
+            }
+
+            // Draw the found barcode box
+            if (result.box) {
+                Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, { color: "#00F", lineWidth: 2 });
+            }
+
+            // Draw the found barcode line
+            if (result.codeResult && result.codeResult.code) {
+                Quagga.ImageDebug.drawPath(result.line, { x: 'x', y: 'y' }, drawingCtx, { color: 'red', lineWidth: 3 });
+            }
+        }
+    });
+    
+    // Add button to restart scanner when modal is closed
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.closest('#cancelProductBtn')) {
+            // Resume scanner when modal is closed
+            setTimeout(() => {
+                scannerStatus.classList.remove('from-green-500', 'to-emerald-600');
+                scannerStatus.classList.add('from-blue-500', 'to-indigo-600');
+                scannerStatus.querySelector('span').textContent = 'Siap untuk scan';
+                addNewProductBtn.classList.add('hidden');
+                if (isScanning) {
+                    Quagga.resume();
+                } else {
+                    initScanner();
+                }
+            }, 500);
+        }
+    });
+    
+    // Automatically start scanner after page load with a slight delay
+    setTimeout(() => {
+        initScanner();
+    }, 1000);
+    
+    // Clean up when page is unloaded
+    window.addEventListener('beforeunload', function() {
+        stopScanner();
+    });
+    
+    // Add CSS to ensure video takes full width and height
+    const style = document.createElement('style');
+    style.textContent = `
+        #interactive, .video-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        #interactive canvas, #interactive video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    `;
+    document.head.appendChild(style);
+>>>>>>> Stashed changes
 });
 </script>
-@endsection
+@endpush

@@ -1,7 +1,14 @@
+<!-- web.php -->
+
 <?php
 
 use Illuminate\Support\Facades\Route;
 
+<<<<<<< Updated upstream
+=======
+
+// Public routes (no authentication required)
+>>>>>>> Stashed changes
 Route::get('/', function () {
     return view('welcome');
 });

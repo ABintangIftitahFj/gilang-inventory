@@ -19,8 +19,12 @@
         </div>
     </div>
 </div>
+
+{{-- Include Product Form Modal --}}
+<x-product.modal-form />
 @endsection
 
 @push('scripts')
     @vite('resources/js/scanner.js')
+    @vite('resources/js/product.js')
 @endpush

@@ -3,6 +3,15 @@
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Elemen-elemen modal produk
+    const productModal = document.getElementById('productModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const productForm = document.getElementById('productForm');
+    const productId = document.getElementById('productId');
+    const productBarcode = document.getElementById('productBarcode');
+    const productDateReceived = document.getElementById('productDateReceived');
+    const closeProductModal = document.getElementById('closeProductModal');
+    const cancelProductBtn = document.getElementById('cancelProductBtn');
     const codeReader = new BrowserMultiFormatReader();
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
@@ -80,8 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Anda bisa menambahkan logika lebih lanjut di sini,
                     // misalnya menampilkan detail produk di UI
                 } else { // data.status === 'not_exists'
-                    resultElement.textContent = `Barcode ${barcode}: BELUM ADA di database.`;
-                    resultElement.style.color = 'red';
+                    resultElement.textContent = `Barcode ${barcode}: BELUM ADA di database. Membuka form produk baru...`;
+                    resultElement.style.color = 'orange';
+                    
+                    // Tampilkan form produk dan isi field barcode secara otomatis
+                    showProductFormWithBarcode(barcode);
                 }
             } else {
                 resultElement.textContent = `Error checking barcode: ${data.message || 'Unknown error'}`;
@@ -184,9 +196,64 @@ document.addEventListener('DOMContentLoaded', () => {
         switchCameraButton.addEventListener('click', switchCamera);
     }
 
+    // Event listener untuk tombol close dan cancel pada modal produk
+    if (closeProductModal) {
+        closeProductModal.addEventListener('click', () => {
+            productModal.classList.add('hidden');
+            // Restart scanning setelah modal ditutup
+            startScanning();
+        });
+    }
+    
+    if (cancelProductBtn) {
+        cancelProductBtn.addEventListener('click', () => {
+            productModal.classList.add('hidden');
+            // Restart scanning setelah modal ditutup
+            startScanning();
+        });
+    }
+    
+    // Tambahkan event listener untuk form submission
+    if (productForm) {
+        productForm.addEventListener('submit', function(event) {
+            // Form handling logic dihandle oleh product.js
+            // Kita cukup restart scanning setelah form disubmit
+            setTimeout(() => {
+                startScanning();
+            }, 1000);
+        });
+    }
+
     getDevicesAndSelectFirst();
 
     window.addEventListener('beforeunload', () => {
         stopScanning();
     });
+    
+    // Fungsi untuk menampilkan form produk dengan barcode yang sudah terisi
+    const showProductFormWithBarcode = (barcode) => {
+        if (!productModal) {
+            console.error('Product modal not found');
+            return;
+        }
+        
+        // Siapkan form untuk produk baru
+        modalTitle.textContent = 'Tambah Produk Baru';
+        productForm.reset();
+        productId.value = ''; // Pastikan ID kosong karena ini produk baru
+        
+        // Isi field barcode dengan barcode yang baru di-scan
+        productBarcode.value = barcode;
+        
+        // Set tanggal hari ini sebagai default untuk tanggal terima
+        const today = new Date().toISOString().split('T')[0];
+        productDateReceived.value = today;
+        
+        // Tampilkan modal
+        productModal.classList.remove('hidden');
+        console.log('Product modal opened with barcode:', barcode);
+        
+        // Pause scanning saat form terbuka (opsional)
+        stopScanning();
+    };
 });

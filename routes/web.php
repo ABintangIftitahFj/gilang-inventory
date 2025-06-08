@@ -22,6 +22,11 @@ Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('welcome');
 
+// Barcode scanner diagnostic tool
+Route::get('/camera-test', function () {
+    return redirect('/fix-barcode-issues.php');
+})->name('camera.test');
+
 // Fallback route untuk API barcode yang mungkin salah rute
 Route::post('/api/v1/barcode/check', [App\Http\Controllers\Api\BarcodeController::class, 'checkBarcode']);
 

@@ -19,13 +19,10 @@ class BarcodeController extends Controller
      */
     public function checkBarcode(Request $request): JsonResponse
     {
-        // Log request untuk debugging
-        Log::info('BarcodeController::checkBarcode endpoint hit.', [
-            'payload' => $request->all(),
-            'url' => $request->fullUrl(),
-        ]);
+        // Reduced logging to improve performance - only log important information
+        Log::info('Barcode check for: ' . $request->input('barcode'));
 
-        // Validasi input
+        // Validasi input - simplified validation
         $validator = Validator::make($request->all(), [
             'barcode' => 'required|string|max:255',
         ]);
@@ -36,13 +33,15 @@ class BarcodeController extends Controller
                 'success' => false,
                 'message' => 'Validasi gagal.',
                 'errors' => $validator->errors()
-            ], 422);  // 422 Unprocessable Entity lebih cocok untuk error validasi
+            ], 422);
         }
 
         $barcode = $request->input('barcode');
 
-        // Cari produk berdasarkan barcode
-        $product = Product::where('barcode', $barcode)->first();
+        // Cari produk berdasarkan barcode - using select to only get needed fields
+        $product = Product::where('barcode', $barcode)
+            ->select('id', 'product_name', 'barcode', 'status')
+            ->first();
 
         if ($product) {
             // Jika produk ditemukan
@@ -51,14 +50,15 @@ class BarcodeController extends Controller
                 'status' => 'exists',
                 'message' => 'Barcode sudah terdaftar di dalam database.',
                 'data' => $product
-            ]);
+            ]);  // Default 200 OK
         } else {
-            // Jika produk tidak ditemukan
+            // Jika produk tidak ditemukan, tetap kembalikan 200 OK
+            // agar frontend dapat memproses 'status: not_exists'
             return response()->json([
                 'success' => true,
                 'status' => 'not_exists',
                 'message' => 'Barcode belum terdaftar di dalam database.'
-            ], 404);  // Kembalikan status 404 Not Found agar lebih semantik
+            ], 200);  // Explicitly return 200 OK
         }
     }
 }

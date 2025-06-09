@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -37,6 +38,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('ProductController@store called with data:', $request->all());
+        
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:255',
             'barcode' => 'required|string|unique:products,barcode|max:255',
@@ -52,23 +55,38 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Log::warning('Product validation failed:', $validator->errors()->toArray());
             return redirect()
                 ->back()
                 ->withErrors($validator)
                 ->withInput();
         }
 
-        // Buat produk baru
-        $product = Product::create($request->all());
+        try {
+            // Buat produk baru
+            $product = Product::create($request->all());
+            \Log::info('Product created successfully:', $product->toArray());
 
-        // Buat transaksi masuk otomatis saat produk baru ditambahkan
-        $product->transactions()->create([
-            'barcode' => $product->barcode,
-            'transaction_type' => 'IN',
-            'quantity' => 1,
-            'user_name' => optional(auth()->user())->name ?? 'System',
-            'notes' => 'Produk baru ditambahkan'
-        ]);
+            // Buat transaksi masuk otomatis saat produk baru ditambahkan
+            $transaction = $product->transactions()->create([
+                'barcode' => $product->barcode,
+                'product_name' => $product->product_name,
+                'transaction_type' => 'IN',
+                'quantity' => 1,
+                'user_name' => optional(auth()->user())->name ?? 'System',
+                'notes' => 'Produk baru ditambahkan'
+            ]);
+            \Log::info('Initial transaction created:', $transaction->toArray());
+
+        } catch (\Exception $e) {
+            \Log::error('Error in ProductController@store:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to create product: ' . $e->getMessage());
+        }
 
         return redirect()
             ->route('products.index')
@@ -142,11 +160,42 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
+        try {
+            \Log::info('Starting to delete product:', $product->toArray());
+            
+            // Create transaction first
+            $transaction = new Transaction();
+            $transaction->product_id = $product->id;
+            $transaction->barcode = $product->barcode;
+            $transaction->product_name = $product->product_name;
+            $transaction->transaction_type = 'OUT';
+            $transaction->quantity = 1;
+            $transaction->user_name = auth()->user() ? auth()->user()->name : 'System';
+            $transaction->notes = 'Produk dihapus dari sistem';
+            
+            // Save transaction
+            if (!$transaction->save()) {
+                throw new \Exception('Failed to create transaction');
+            }
+            
+            \Log::info('Created OUT transaction for deleted product:', $transaction->toArray());
+            
+            // Delete the product after transaction is confirmed saved
+            $product->delete();
+            \Log::info('Product deleted successfully:', $product->toArray());
 
-        return redirect()
-            ->route('products.index')
-            ->with('success', 'Product deleted successfully');
+            return redirect()
+                ->route('products.index')
+                ->with('success', 'Product deleted successfully');
+        } catch (\Exception $e) {
+            \Log::error('Error deleting product:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to delete product: ' . $e->getMessage());
+        }
     }
 
     /**

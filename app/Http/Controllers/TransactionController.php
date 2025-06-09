@@ -16,8 +16,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::with('product')->latest()->get();
-        return view('transactions.index', compact('transactions'));
+        $transactions = Transaction::latest()->get(); 
+    return view('transactions.index', compact('transactions'));
     }
 
     /**
@@ -39,9 +39,12 @@ class TransactionController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('TransactionController@store called with data:', $request->all());
+        
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'barcode' => 'required|string|exists:products,barcode',
+            'product_name' => 'required|string|max:255', // nambahin ini
             'transaction_type' => 'required|in:IN,OUT',
             'quantity' => 'required|integer|min:1',
             'user_name' => 'required|string|max:255',
@@ -49,6 +52,7 @@ class TransactionController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Log::warning('Transaction validation failed:', $validator->errors()->toArray());
             return redirect()
                 ->back()
                 ->withErrors($validator)
@@ -56,21 +60,33 @@ class TransactionController extends Controller
         }
 
         // Create the transaction
-        $transaction = Transaction::create($request->all());
+        try {
+            $transaction = Transaction::create($request->all());
+            \Log::info('Transaction created successfully:', $transaction->toArray());
 
-        // Update product status based on transaction
-        $product = Product::find($request->product_id);
+            // Update product status based on transaction
+            $product = Product::find($request->product_id);
+            \Log::info('Found product for transaction:', $product ? $product->toArray() : 'null');
 
-        // Logic for updating product status based on transaction type
-        // This is a simplified approach - you might need more complex logic
-        if ($request->transaction_type == 'OUT' && $product) {
-            // If all product is out of stock, change status
-            // You might need to implement a way to track quantity
-            $product->status = 'out_of_stock';
-            $product->save();
-        } elseif ($request->transaction_type == 'IN' && $product) {
-            $product->status = 'in_stock';
-            $product->save();
+            if ($product) {
+                $oldStatus = $product->status;
+                // Logic for updating product status based on transaction type
+                if ($request->transaction_type == 'OUT') {
+                    $product->status = 'out_of_stock';
+                } else {
+                    $product->status = 'in_stock';
+                }
+                $product->save();
+                \Log::info('Updated product status from ' . $oldStatus . ' to ' . $product->status);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error creating transaction:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()
+                ->back()
+                ->with('error', 'Failed to create transaction: ' . $e->getMessage());
         }
 
         return redirect()
@@ -287,21 +303,25 @@ class TransactionController extends Controller
      */
     public function apiActivityLog()
     {
-        $transactions = Transaction::with('product')
-            ->latest()
-            ->get()
-            ->map(function ($transaction) {
-                return [
-                    'id' => $transaction->id,
-                    'product_name' => $transaction->product->product_name,
-                    'barcode' => $transaction->barcode,
-                    'transaction_type' => $transaction->transaction_type,
-                    'quantity' => $transaction->quantity,
-                    'user_name' => $transaction->user_name,
-                    'notes' => $transaction->notes,
-                    'created_at' => $transaction->created_at->format('Y-m-d H:i:s')
-                ];
-            });
+        $transactions = Transaction::latest()
+        ->get()
+        ->map(function ($transaction) {
+            // Gunakan kolom product_name yang baru ditambahkan
+            // Jika kolom itu NULL (misal untuk transaksi lama yang tidak dicatat product_name-nya),
+            // baru fallback ke relasi (jika product_id tidak NULL) atau string default.
+            $productName = $transaction->product_name ?? (optional($transaction->product)->product_name ?? 'Produk tidak tersedia');
+
+            return [
+                'id' => $transaction->id,
+                'product_name' => $productName, // Gunakan product_name dari kolom transaksi
+                'barcode' => $transaction->barcode,
+                'transaction_type' => $transaction->transaction_type,
+                'quantity' => $transaction->quantity,
+                'user_name' => $transaction->user_name,
+                'notes' => $transaction->notes,
+                'created_at' => $transaction->created_at->format('Y-m-d H:i:s')
+            ];
+        });
 
         return response()->json([
             'success' => true,

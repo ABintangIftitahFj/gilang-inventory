@@ -28,16 +28,15 @@ Route::prefix('v1')->group(function () {
     // Endpoint utama untuk check barcode
     Route::post('barcode/check', [BarcodeController::class, 'checkBarcode']);
 
+    // Product routes - public access since they're used from web interface
+    Route::apiResource('products', ProductController::class);
+    Route::get('inventory/stock-levels', [ProductController::class, 'stockLevels']);
 
     // --- Rute Terproteksi (Wajib login/autentikasi via Sanctum) ---
     Route::middleware('auth:sanctum')->group(function () {
-        
         // Rute terkait Autentikasi User
         Route::post('auth/logout', [AuthController::class, 'logout']);
         Route::get('auth/user', [AuthController::class, 'user']);
-
-        // Rute untuk Resource Products (CRUD)
-        Route::apiResource('products', ProductController::class);
 
         // Rute untuk Resource Transactions
         Route::prefix('transactions')->group(function() {
@@ -46,11 +45,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/{transaction}', [TransactionController::class, 'show']);
         });
 
-        // Rute tambahan terkait Inventory
+        // Rute tambahan terkait Inventory (selain products)
         Route::prefix('inventory')->group(function () {
-            Route::get('stock-levels', [ProductController::class, 'stockLevels']);
             Route::get('activity-log', [TransactionController::class, 'activityLog']);
-            
             // Anda punya 'processBarcode' di sini, mungkin maksudnya berbeda dengan 'checkBarcode'?
             // Jika fungsinya sama, pertimbangkan untuk menyatukannya.
             Route::post('scan', [ProductController::class, 'processBarcode']);

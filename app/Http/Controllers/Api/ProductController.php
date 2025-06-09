@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
+use App\Models\Transaction; // Make sure to import the Transaction model
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -45,6 +46,8 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('API ProductController@store called with data:', $request->all());
+        
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:255',
             'barcode' => 'required|string|unique:products,barcode|max:255',
@@ -60,19 +63,45 @@ class ProductController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Log::warning('API Product validation failed:', $validator->errors()->toArray());
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
 
-        $product = Product::create($request->all());
+        try {
+            // Create the product
+            $product = Product::create($request->all());
+            \Log::info('API Product created successfully:', $product->toArray());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product created successfully',
-            'data' => $product
-        ], 201);
+            // Create an automatic "IN" transaction for the new product
+            $transaction = $product->transactions()->create([
+                'barcode' => $product->barcode,
+                'product_name' => $product->product_name, // <--- TAMBAHKAN INI
+                'transaction_type' => 'IN',
+                'quantity' => 1,
+                'user_name' => optional(auth()->user())->name ?? 'System',
+                'notes' => 'Produk baru ditambahkan'
+            ]);
+            \Log::info('API Initial transaction created:', $transaction->toArray());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Product created successfully',
+                'data' => $product->load('transactions')
+            ], 201);
+
+        } catch (\Exception $e) {
+            \Log::error('Error in API ProductController@store:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -122,12 +151,44 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
+        try {
+            \Log::info('API: Starting to delete product:', $product->toArray());
+            
+        // Create transaction first
+        $transaction = new Transaction();
+        $transaction->product_id = $product->id;
+        $transaction->barcode = $product->barcode;
+        $transaction->product_name = $product->product_name; // <--- TAMBAHKAN INI
+        $transaction->transaction_type = 'OUT';
+        $transaction->quantity = 1; // Sesuaikan jika Anda ingin 0 untuk log penghapusan
+        $transaction->user_name = auth()->user() ? auth()->user()->name : 'System';
+        $transaction->notes = 'Produk dihapus dari sistem';
+            
+            // Save transaction
+            if (!$transaction->save()) {
+                throw new \Exception('Failed to create transaction');
+            }
+            
+            \Log::info('API: Created OUT transaction for deleted product:', $transaction->toArray());
+            
+            // Delete the product after transaction is confirmed saved
+            $product->delete();
+            \Log::info('API: Product deleted successfully:', $product->toArray());
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Product deleted successfully'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Product deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('API: Error deleting product:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete product: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**

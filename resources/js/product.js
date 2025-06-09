@@ -77,27 +77,36 @@ document.addEventListener('DOMContentLoaded', function () {
     function fetchProductData(id) {
         console.log('Fetching product data for ID:', id);
         
-        // Menggunakan URL API yang benar dengan base URL dinamis
         const baseUrl = window.location.origin;
-        return fetch(`${baseUrl}/api/v1/products/${id}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(result => {
-                if (result.success) {
-                    return result.data;
-                } else {
-                    throw new Error('Failed to get product data');
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching product data:', error);
-                showToast('Gagal mengambil data produk', 'error');
-                return null;
-            });
+        return fetch(`${baseUrl}/api/v1/products/${id}`, {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }
+        })
+        .then(async response => {
+            console.log('Response status:', response.status);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Error response:', errorData);
+                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('API Response:', result);
+            if (result.success) {
+                return result.data;
+            } else {
+                throw new Error(result.message || 'Failed to get product data');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching product data:', error);
+            showToast(`Gagal mengambil data produk: ${error.message}`, 'error');
+            return null;
+        });
     }
 
     // Fungsi untuk mengisi form dengan data produk
@@ -140,6 +149,12 @@ document.addEventListener('DOMContentLoaded', function () {
             const url = isUpdate ? `${baseUrl}/api/v1/products/${productId.value}` : `${baseUrl}/api/v1/products`;
             const method = isUpdate ? 'PUT' : 'POST';
             
+            console.log('Submitting product form:', {
+                url: url,
+                method: method,
+                data: productData
+            });
+            
             // Send the AJAX request
             fetch(url, {
                 method: method,
@@ -150,12 +165,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(productData)
             })
             .then(response => {
+                console.log('Product API Response status:', response.status);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return response.json();
             })
             .then(result => {
+                console.log('Product API Response data:', result);
                 if (result.success) {
                     showToast(isUpdate ? 'Produk berhasil diperbarui!' : 'Produk berhasil ditambahkan!');
                     productModal.classList.add('hidden');

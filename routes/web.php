@@ -2,28 +2,33 @@
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\Api\ProductController as ApiProductController;
+use App\Http\Controllers\Api\BarcodeController;
 use App\Http\Middleware\AdminAccess;
 use App\Http\Middleware\InventoryAccess;
 use Illuminate\Support\Facades\Route;
 
 /*
- * |--------------------------------------------------------------------------
- * | Web Routes
- * |--------------------------------------------------------------------------
- * |
- * | Here is where you can register web routes for your application. These
- * | routes are loaded by the RouteServiceProvider and all of them will
- * | be assigned to the "web" middleware group.
- * |
- */
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group.
+|
+*/
 
 // Public routes (no authentication required)
 Route::get('/', function () {
     return redirect()->route('dashboard');
 })->name('welcome');
 
-// Fallback route untuk API barcode yang mungkin salah rute
-Route::post('/api/v1/barcode/check', [App\Http\Controllers\Api\BarcodeController::class, 'checkBarcode']);
+// API routes that need to be accessible without auth
+Route::prefix('api/v1')->group(function () {
+    Route::post('/barcode/check', [BarcodeController::class, 'checkBarcode']);
+    Route::apiResource('products', ApiProductController::class);
+});
 
 // Authentication routes
 Route::get('/login', [App\Http\Controllers\AuthController::class, 'showLoginForm'])->name('login');
@@ -42,19 +47,12 @@ Route::middleware(['auth'])->group(function () {
         return view('scan');
     })->name('scan');
 
-    // API Test route
-    Route::get('/api-test', function () {
-        return view('api-test');
-    })->name('api.test');
-
     // Section views - sekarang mendapatkan data dari controller
     Route::get('/section/product', [ProductController::class, 'index'])->name('section.product');
 
-    // API routes moved to Api/ProductController and defined in api.php
-
     // Inventory Management routes - protected with inventory.access middleware
-    Route::middleware([App\Http\Middleware\InventoryAccess::class])->prefix('inventory')->group(function () {
-        // Product routes
+    Route::middleware([InventoryAccess::class])->prefix('inventory')->group(function () {
+        // Product routes for web interface
         Route::resource('products', ProductController::class);
 
         // Transaction routes
@@ -66,10 +64,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // Admin-only routes
-    Route::middleware([App\Http\Middleware\AdminAccess::class])->prefix('admin')->group(function () {
+    Route::middleware([AdminAccess::class])->prefix('admin')->group(function () {
         // User management
         Route::get('/users', function () {
-            // This would typically be a UserController method
             return view('admin.users');
         })->name('admin.users');
 

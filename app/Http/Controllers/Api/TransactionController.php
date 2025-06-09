@@ -16,11 +16,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::with('product')->get();
-        return response()->json([
-            'success' => true,
-            'data' => $transactions
-        ]);
+        $transactions = Transaction::latest()->get(); 
+    return view('transactions.index', compact('transactions'));
     }
 
     /**
@@ -76,7 +73,7 @@ class TransactionController extends Controller
      */
     public function activityLog()
     {
-        $transactions = Transaction::with('product')
+        $transactions = Transaction::latest()
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -84,7 +81,7 @@ class TransactionController extends Controller
             return [
                 'id' => $transaction->id,
                 'barcode' => $transaction->barcode,
-                'product_name' => $transaction->product ? $transaction->product->product_name : 'Unknown Product',
+                'product_name' => $productName,
                 'transaction_type' => $transaction->transaction_type,
                 'quantity' => $transaction->quantity,
                 'user_name' => $transaction->user_name,

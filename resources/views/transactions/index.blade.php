@@ -40,7 +40,11 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">
-                                {{ $transaction->product_name ?? 'Produk tidak tersedia' }}
+                                @if($transaction->transaction_type == 'IN')
+                                    {{ $transaction->product ? $transaction->product->product_name : ($transaction->product_name ?? 'Produk tidak tersedia') }}
+                                @else
+                                    {{ $transaction->product_name ?? ($transaction->product ? $transaction->product->product_name : 'Produk tidak tersedia') }}
+                                @endif
                             </div>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

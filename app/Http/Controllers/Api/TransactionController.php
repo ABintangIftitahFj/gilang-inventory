@@ -57,7 +57,21 @@ class TransactionController extends Controller
             ], 422);
         }
 
-        $transaction = Transaction::create($request->all());
+        // Cari produk berdasarkan barcode untuk mendapatkan product_name
+        $product = \App\Models\Product::where('barcode', $request->barcode)->first();
+        if (!$product) {
+            return response()->json([
+                'success' => false,
+                'errors' => ['barcode' => ['Product tidak ditemukan dengan barcode tersebut']]
+            ], 422);
+        }
+
+        // Buat data transaksi dengan tambahan product_id dan product_name
+        $data = $request->all();
+        $data['product_id'] = $product->id;
+        $data['product_name'] = $product->product_name;
+
+        $transaction = Transaction::create($data);
 
         return response()->json([
             'success' => true,
@@ -73,11 +87,15 @@ class TransactionController extends Controller
      */
     public function activityLog()
     {
-        $transactions = Transaction::latest()
+        $transactions = Transaction::with('product')
+            ->latest()
             ->orderBy('created_at', 'desc')
             ->get();
 
         $activityData = $transactions->map(function ($transaction) {
+            // Gunakan kolom product_name dalam transaksi jika ada, jika tidak gunakan dari relasi product
+            $productName = $transaction->product_name ?? ($transaction->product ? $transaction->product->product_name : 'Produk tidak tersedia');
+            
             return [
                 'id' => $transaction->id,
                 'barcode' => $transaction->barcode,

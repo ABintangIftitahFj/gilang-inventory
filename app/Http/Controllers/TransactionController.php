@@ -44,7 +44,7 @@ class TransactionController extends Controller
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'barcode' => 'required|string|exists:products,barcode',
-            'product_name' => 'required|string|max:255', // nambahin ini
+            // Hapus validasi product_name dari request
             'transaction_type' => 'required|in:IN,OUT',
             'quantity' => 'required|integer|min:1',
             'user_name' => 'required|string|max:255',
@@ -59,26 +59,27 @@ class TransactionController extends Controller
                 ->withInput();
         }
 
-        // Create the transaction
         try {
-            $transaction = Transaction::create($request->all());
+            // Ambil nama produk dari database
+            $product = Product::find($request->product_id);
+            if (!$product) {
+                throw new \Exception('Produk tidak ditemukan');
+            }
+            $data = $request->all();
+            $data['product_name'] = $product->product_name;
+
+            $transaction = Transaction::create($data);
             \Log::info('Transaction created successfully:', $transaction->toArray());
 
             // Update product status based on transaction
-            $product = Product::find($request->product_id);
-            \Log::info('Found product for transaction:', $product ? $product->toArray() : 'null');
-
-            if ($product) {
-                $oldStatus = $product->status;
-                // Logic for updating product status based on transaction type
-                if ($request->transaction_type == 'OUT') {
-                    $product->status = 'out_of_stock';
-                } else {
-                    $product->status = 'in_stock';
-                }
-                $product->save();
-                \Log::info('Updated product status from ' . $oldStatus . ' to ' . $product->status);
+            $oldStatus = $product->status;
+            if ($request->transaction_type == 'OUT') {
+                $product->status = 'out_of_stock';
+            } else {
+                $product->status = 'in_stock';
             }
+            $product->save();
+            \Log::info('Updated product status from ' . $oldStatus . ' to ' . $product->status);
         } catch (\Exception $e) {
             \Log::error('Error creating transaction:', [
                 'error' => $e->getMessage(),

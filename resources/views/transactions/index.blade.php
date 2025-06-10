@@ -81,7 +81,7 @@
                     @forelse($transactions as $transaction)
                     <tr class="hover:bg-gray-50 transition-colors duration-200">
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ $transaction->created_at->format('Y-m-d H:i') }}
+                            {{ $transaction->created_at ? $transaction->created_at->format('Y-m-d H:i') : 'N/A' }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="text-sm font-medium text-gray-900">

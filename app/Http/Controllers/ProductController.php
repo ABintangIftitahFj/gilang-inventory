@@ -39,7 +39,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         \Log::info('ProductController@store called with data:', $request->all());
-        
+
         $validator = Validator::make($request->all(), [
             'product_name' => 'required|string|max:255',
             'barcode' => 'required|string|unique:products,barcode|max:255',
@@ -77,7 +77,6 @@ class ProductController extends Controller
                 'notes' => 'Produk baru ditambahkan'
             ]);
             \Log::info('Initial transaction created:', $transaction->toArray());
-
         } catch (\Exception $e) {
             \Log::error('Error in ProductController@store:', [
                 'error' => $e->getMessage(),
@@ -162,7 +161,7 @@ class ProductController extends Controller
     {
         try {
             \Log::info('Starting to delete product:', $product->toArray());
-            
+
             // Create transaction first
             $transaction = new Transaction();
             $transaction->product_id = $product->id;
@@ -172,14 +171,14 @@ class ProductController extends Controller
             $transaction->quantity = 1;
             $transaction->user_name = auth()->user() ? auth()->user()->name : 'System';
             $transaction->notes = 'Produk dihapus dari sistem';
-            
+
             // Save transaction
             if (!$transaction->save()) {
                 throw new \Exception('Failed to create transaction');
             }
-            
+
             \Log::info('Created OUT transaction for deleted product:', $transaction->toArray());
-            
+
             // Delete the product after transaction is confirmed saved
             $product->delete();
             \Log::info('Product deleted successfully:', $product->toArray());
@@ -205,11 +204,17 @@ class ProductController extends Controller
      */
     public function stockLevels()
     {
-        $inStock = Product::where('status', 'in_stock')->count();
-        $outOfStock = Product::where('status', 'out_of_stock')->count();
         $products = Product::with('transactions')->get();
 
-        return view('inventory.stock-levels', compact('inStock', 'outOfStock', 'products'));
+        // Calculate stock for each product based on transactions
+        $products->transform(function ($product) {
+            $inQuantity = $product->transactions->where('transaction_type', 'IN')->sum('quantity');
+            $outQuantity = $product->transactions->where('transaction_type', 'OUT')->sum('quantity');
+            $product->current_stock = $inQuantity - $outQuantity;
+            return $product;
+        });
+
+        return view('inventory.stock-levels', compact('products'));
     }
 
     /**

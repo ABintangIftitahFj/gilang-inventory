@@ -2,16 +2,16 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-6 max-w-3xl">
-    <div class="mb-6 flex justify-between items-center">
+    <div class="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 sm:gap-0">
         <div>
-            <h1 class="text-2xl font-bold text-gray-900">Detail Transaksi</h1>
-            <p class="mt-1 text-sm text-gray-600">Informasi lengkap transaksi</p>
+            <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Detail Transaksi</h1>
+            <p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-gray-600">Informasi lengkap transaksi</p>
         </div>
-        <a href="{{ route('transactions.index') }}" class="text-indigo-600 hover:text-indigo-900 font-medium flex items-center gap-1">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <a href="{{ route('transactions.index') }}" class="text-indigo-600 hover:text-indigo-900 font-medium flex items-center gap-1 bg-indigo-50 py-1.5 px-3 rounded-md self-start sm:self-auto">
+            <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
-            Kembali
+            <span class="text-sm sm:text-base">Kembali</span>
         </a>
     </div>
 

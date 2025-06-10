@@ -8,8 +8,11 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                'resources/css/responsive.css',
                 'resources/js/app.js',
-                'resources/js/scanner.js', // <-- TAMBAHKAN BARIS INI
+                'resources/js/scanner.js', 
+                'resources/js/mobile.js', // For mobile-friendly enhancements
+                'resources/js/menu-fix.js', // Fix for mobile menu toggle
             ],
             refresh: true,
         }),

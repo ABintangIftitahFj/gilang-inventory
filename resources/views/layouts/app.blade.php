@@ -5,40 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gilang Inventory</title>
 
-    @vite('resources/css/app.css')
+    @vite(['resources/css/app.css', 'resources/css/responsive.css'])
     @stack('styles')
 </head>
 <body class="bg-gray-50">
-    <nav class="bg-white shadow p-4">
+    <nav class="bg-white shadow p-3 sm:p-4 sticky top-0 z-40">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center">
-                <h1 class="text-xl font-bold text-gray-800">📦 Gilang Inventory</h1>
+                <h1 class="text-lg sm:text-xl font-bold text-gray-800">📦 Gilang Inventory</h1>
             </div>
-            <div class="flex items-center space-x-4">
-                <a href="/dashboard" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-                <a href="#" class="text-gray-600 hover:text-gray-800">Profil</a>
+            <div class="flex items-center space-x-2 sm:space-x-4">
+                <a href="/dashboard" class="text-blue-600 hover:text-blue-800 text-sm sm:text-base">Dashboard</a>
+                <a href="#" class="text-gray-600 hover:text-gray-800 text-sm sm:text-base">Profil</a>
                 <form method="POST" action="{{ route('logout') }}" class="inline">
                     @csrf
-                    <button type="submit" class="text-red-600 hover:text-red-800">Keluar</button>
+                    <button type="submit" class="text-red-600 hover:text-red-800 text-sm sm:text-base">Keluar</button>
                 </form>
             </div>
         </div>
     </nav>
 
-    <div class="container mx-auto flex flex-col md:flex-row">
+    <div class="container mx-auto flex flex-col md:flex-row mt-2 sm:mt-4">
         <!-- Sidebar Navigation -->
         <div class="w-full md:w-64 bg-white shadow-lg md:min-h-screen">
-            <div class="p-4 border-b border-gray-200">
+            <div class="p-3 sm:p-4 border-b border-gray-200">
                 <div class="flex items-center justify-between">
-                    <span class="text-lg font-semibold text-gray-800">Menu Navigasi</span>
-                    <button id="mobile-menu-button" class="md:hidden rounded-lg focus:outline-none focus:shadow-outline">
-                        <svg fill="currentColor" viewBox="0 0 20 20" class="w-6 h-6">
+                    <span class="text-base sm:text-lg font-semibold text-gray-800">Menu Navigasi</span>
+                    <button id="mobile-menu-button" class="md:hidden rounded-lg focus:outline-none focus:shadow-outline bg-gray-100 hover:bg-gray-200 p-2">
+                        <svg fill="currentColor" viewBox="0 0 20 20" class="w-5 h-5">
                             <path id="mobile-menu-icon" fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
                         </svg>
                     </button>
                 </div>
             </div>
-            <nav class="mt-2 p-2" id="sidebar-nav">
+            <nav class="mt-2 p-2 overflow-y-auto max-h-[60vh] md:max-h-full" id="sidebar-nav">
                 <a href="/dashboard" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 hover:text-blue-700 {{ request()->is('dashboard') ? 'bg-blue-100 text-blue-700' : 'text-gray-500' }} flex items-center">
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
@@ -115,7 +115,17 @@
         </div>
 
         <!-- Main Content -->
-        <main class="w-full px-4 py-6">
+        <main class="w-full px-3 sm:px-4 py-3 sm:py-6">
+            <!-- Dynamic Back Button (Mobile) -->
+            <div id="back-button" class="mb-3 hidden">
+                <a href="javascript:history.back()" class="inline-flex items-center px-3 py-1 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-lg text-sm transition-all duration-200">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>Kembali</span>
+                </a>
+            </div>
+            
             <!-- Toast notification -->
             <div id="toast" class="fixed bottom-4 right-4 flex items-center p-4 mb-4 w-full max-w-xs text-gray-500 bg-white rounded-lg shadow-lg border border-gray-200 transition-opacity duration-300 ease-in-out hidden z-50" role="alert">
                 <div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 text-green-500 bg-green-100 rounded-lg">
@@ -140,24 +150,59 @@
     @stack('scripts')
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobile-menu-button').addEventListener('click', function() {
-            document.getElementById('sidebar-nav').classList.toggle('hidden');
-            document.getElementById('sidebar-nav').classList.toggle('block');
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sidebarNav = document.getElementById('sidebar-nav');
+            const backButton = document.getElementById('back-button');
+            
+            if (mobileMenuButton && sidebarNav) {
+                mobileMenuButton.addEventListener('click', function() {
+                    sidebarNav.classList.toggle('hidden');
+                    sidebarNav.classList.toggle('block');
+                });
 
-        // Only hide the menu on mobile initially
-        if (window.innerWidth < 768) {
-            document.getElementById('sidebar-nav').classList.add('hidden');
-        }
+                // Only hide the menu on mobile initially
+                if (window.innerWidth < 768) {
+                    sidebarNav.classList.add('hidden');
+                }
 
-        // Resize handler to handle responsive behavior
-        window.addEventListener('resize', function() {
-            if (window.innerWidth >= 768) {
-                document.getElementById('sidebar-nav').classList.remove('hidden');
-            } else {
-                document.getElementById('sidebar-nav').classList.add('hidden');
+                // Resize handler to handle responsive behavior
+                window.addEventListener('resize', function() {
+                    if (window.innerWidth >= 768) {
+                        sidebarNav.classList.remove('hidden');
+                    } else {
+                        sidebarNav.classList.add('hidden');
+                    }
+                });
+                
+                // Make sure all links in sidebar are visible
+                const sidebarLinks = sidebarNav.querySelectorAll('a');
+                sidebarLinks.forEach(link => {
+                    if (link.classList.contains('hidden')) {
+                        link.classList.remove('hidden');
+                        link.classList.add('block');
+                    }
+                });
             }
+            
+            // Show back button on inner pages (not on dashboard)
+            const currentPath = window.location.pathname;
+            if (backButton && currentPath !== '/' && currentPath !== '/dashboard') {
+                backButton.classList.remove('hidden');
+                backButton.classList.add('block', 'md:hidden');
+            }
+            
+            // Close sidebar when clicking a link on mobile
+            const sidebarLinks = document.querySelectorAll('#sidebar-nav a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 768) {
+                        sidebarNav.classList.add('hidden');
+                        sidebarNav.classList.remove('block');
+                    }
+                });
+            });
         });
     </script>
 </body>

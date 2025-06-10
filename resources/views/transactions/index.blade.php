@@ -34,7 +34,7 @@
                     <div class="text-xs text-gray-500">Jumlah: {{ $transaction->quantity }}</div>
                     <div class="text-xs text-gray-500">User: {{ $transaction->user_name }}</div>
                     <div class="text-xs text-gray-500">Catatan: {{ $transaction->notes ?? '-' }}</div>
-                    <div class="text-xs text-gray-500">Tanggal: {{ $transaction->created_at->format('Y-m-d H:i') }}</div>
+                    <div class="text-xs text-gray-500">Tanggal: {{ $transaction->created_at ? $transaction->created_at->format('Y-m-d H:i') : 'N/A' }}</div>
                 </div>
                 <div class="flex flex-col gap-2">
                     <a href="{{ route('transactions.edit', $transaction->id) }}" class="w-full bg-blue-100 text-blue-700 hover:bg-blue-200 px-4 py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-1">

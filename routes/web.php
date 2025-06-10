@@ -1,23 +1,23 @@
 <?php
 
+use App\Http\Controllers\Api\BarcodeController;
+use App\Http\Controllers\Api\ProductController as ApiProductController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\Api\ProductController as ApiProductController;
-use App\Http\Controllers\Api\BarcodeController;
 use App\Http\Middleware\AdminAccess;
 use App\Http\Middleware\InventoryAccess;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group.
-|
-*/
+ * |--------------------------------------------------------------------------
+ * | Web Routes
+ * |--------------------------------------------------------------------------
+ * |
+ * | Here is where you can register web routes for your application. These
+ * | routes are loaded by the RouteServiceProvider and all of them will
+ * | be assigned to the "web" middleware group.
+ * |
+ */
 
 // Public routes (no authentication required)
 Route::get('/', function () {
@@ -27,7 +27,13 @@ Route::get('/', function () {
 // API routes that need to be accessible without auth
 Route::prefix('api/v1')->group(function () {
     Route::post('/barcode/check', [BarcodeController::class, 'checkBarcode']);
-    Route::apiResource('products', ApiProductController::class);
+    Route::apiResource('products', ApiProductController::class)->names([
+        'index' => 'api.products.index',
+        'store' => 'api.products.store',
+        'show' => 'api.products.show',
+        'update' => 'api.products.update',
+        'destroy' => 'api.products.destroy'
+    ]);
 });
 
 // Authentication routes

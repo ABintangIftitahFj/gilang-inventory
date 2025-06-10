@@ -16,7 +16,7 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::latest()->get();
+        $transactions = Transaction::with('product')->latest()->get();
         return view('transactions.index', compact('transactions'));
     }
 

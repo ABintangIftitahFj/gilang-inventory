@@ -16,8 +16,8 @@ class TransactionController extends Controller
      */
     public function index()
     {
-        $transactions = Transaction::latest()->get(); 
-    return view('transactions.index', compact('transactions'));
+        $transactions = Transaction::latest()->get();
+        return view('transactions.index', compact('transactions'));
     }
 
     /**
@@ -40,7 +40,7 @@ class TransactionController extends Controller
     public function store(Request $request)
     {
         \Log::info('TransactionController@store called with data:', $request->all());
-        
+
         $validator = Validator::make($request->all(), [
             'product_id' => 'required|exists:products,id',
             'barcode' => 'required|string|exists:products,barcode',
@@ -210,11 +210,11 @@ class TransactionController extends Controller
      */
     public function activityLog()
     {
-        $transactions = Transaction::with('product')
+        $activities = Transaction::with('product')
             ->latest()
             ->paginate(50);
 
-        return view('inventory.activity-log', compact('transactions'));
+        return view('inventory.activity-log', compact('activities'));
     }
 
     /**
@@ -305,24 +305,24 @@ class TransactionController extends Controller
     public function apiActivityLog()
     {
         $transactions = Transaction::latest()
-        ->get()
-        ->map(function ($transaction) {
-            // Gunakan kolom product_name yang baru ditambahkan
-            // Jika kolom itu NULL (misal untuk transaksi lama yang tidak dicatat product_name-nya),
-            // baru fallback ke relasi (jika product_id tidak NULL) atau string default.
-            $productName = $transaction->product_name ?? (optional($transaction->product)->product_name ?? 'Produk tidak tersedia');
+            ->get()
+            ->map(function ($transaction) {
+                // Gunakan kolom product_name yang baru ditambahkan
+                // Jika kolom itu NULL (misal untuk transaksi lama yang tidak dicatat product_name-nya),
+                // baru fallback ke relasi (jika product_id tidak NULL) atau string default.
+                $productName = $transaction->product_name ?? (optional($transaction->product)->product_name ?? 'Produk tidak tersedia');
 
-            return [
-                'id' => $transaction->id,
-                'product_name' => $productName, // Gunakan product_name dari kolom transaksi
-                'barcode' => $transaction->barcode,
-                'transaction_type' => $transaction->transaction_type,
-                'quantity' => $transaction->quantity,
-                'user_name' => $transaction->user_name,
-                'notes' => $transaction->notes,
-                'created_at' => $transaction->created_at->format('Y-m-d H:i:s')
-            ];
-        });
+                return [
+                    'id' => $transaction->id,
+                    'product_name' => $productName,  // Gunakan product_name dari kolom transaksi
+                    'barcode' => $transaction->barcode,
+                    'transaction_type' => $transaction->transaction_type,
+                    'quantity' => $transaction->quantity,
+                    'user_name' => $transaction->user_name,
+                    'notes' => $transaction->notes,
+                    'created_at' => $transaction->created_at->format('Y-m-d H:i:s')
+                ];
+            });
 
         return response()->json([
             'success' => true,

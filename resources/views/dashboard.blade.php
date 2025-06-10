@@ -21,14 +21,14 @@
             </div>
         </div>
 
-        <!-- Ringkasan Stok dengan Cards yang Enhanced -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-6 sm:mb-8">
-            <!-- Total Produk -->
+        <!-- Ringkasan dengan Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+            <!-- Total Item -->
             <div class="group relative bg-white hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Produk</p>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $totalProduk }}</p>
+                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Item</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $totalItem }}</p>
                         <div class="flex items-center mt-2">
                             <span class="text-xs {{ $persentasePerubahan >= 0 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }} px-2 py-1 rounded-full">
                                 {{ $persentasePerubahan >= 0 ? '+' : '' }}{{ $persentasePerubahan }}% dari bulan lalu
@@ -43,44 +43,61 @@
                 </div>
             </div>
 
-            <!-- Tersedia -->
-            <div class="group relative bg-white hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100">
+            <!-- Total Jenis Produk -->
+            <div class="group relative bg-white hover:bg-gradient-to-r hover:from-purple-50 hover:to-purple-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Stok Tersedia</p>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $stokTersedia }}</p>
+                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Total Jenis Produk</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $totalJenisProduk }}</p>
                         <div class="flex items-center mt-2">
                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                <div class="bg-green-500 h-2 rounded-full" style="width: {{ $persentaseStok }}%"></div>
+                                <div class="bg-purple-500 h-2 rounded-full" style="width: {{ ($totalJenisProduk / max($totalItem, 1)) * 100 }}%"></div>
                             </div>
-                            <span class="text-xs text-gray-500 ml-2">{{ $persentaseStok }}%</span>
                         </div>
                     </div>
-                    <div class="p-2 sm:p-3 bg-green-100 rounded-xl sm:rounded-2xl group-hover:bg-green-200 transition-colors duration-300">
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <div class="p-2 sm:p-3 bg-purple-100 rounded-xl sm:rounded-2xl group-hover:bg-purple-200 transition-colors duration-300">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                         </svg>
                     </div>
                 </div>
             </div>
 
-            <!-- Habis -->
-            <div class="group relative bg-white hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100 sm:col-span-2 md:col-span-1">
+            <!-- Transaksi Masuk -->
+            <div class="group relative bg-white hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Stok Habis</p>
-                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $stokHabis }}</p>
+                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Transaksi Masuk</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $transaksiMasukHariIni }}</p>
                         <div class="flex items-center mt-2">
-                            @if($stokHabis > 0)
-                                <span class="text-xs text-red-600 bg-red-100 px-2 py-1 rounded-full">Perlu restock!</span>
-                            @else
-                                <span class="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Stok aman</span>
-                            @endif
+                            <span class="text-xs {{ $selisihMasuk >= 0 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }} px-2 py-1 rounded-full">
+                                {{ $selisihMasuk >= 0 ? '+' : '' }}{{ $selisihMasuk }} dari kemarin
+                            </span>
+                        </div>
+                    </div>
+                    <div class="p-2 sm:p-3 bg-green-100 rounded-xl sm:rounded-2xl group-hover:bg-green-200 transition-colors duration-300">
+                        <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transaksi Keluar -->
+            <div class="group relative bg-white hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 shadow-md hover:shadow-lg transition-all duration-300 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs sm:text-sm font-medium text-gray-600 mb-1">Transaksi Keluar</p>
+                        <p class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{{ $transaksiKeluarHariIni }}</p>
+                        <div class="flex items-center mt-2">
+                            <span class="text-xs {{ $selisihKeluar >= 0 ? 'text-green-600 bg-green-100' : 'text-red-600 bg-red-100' }} px-2 py-1 rounded-full">
+                                {{ $selisihKeluar >= 0 ? '+' : '' }}{{ $selisihKeluar }} dari kemarin
+                            </span>
                         </div>
                     </div>
                     <div class="p-2 sm:p-3 bg-red-100 rounded-xl sm:rounded-2xl group-hover:bg-red-200 transition-colors duration-300">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L4.318 15.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"></path>
                         </svg>
                     </div>
                 </div>
@@ -184,7 +201,7 @@
                     <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                     </svg>
-                    Transaksi Terakhir
+                    5 Transaksi Terakhir
                 </h2>
             </div>
             
@@ -194,14 +211,14 @@
                     @forelse($transaksiTerakhir as $transaksi)
                     <div class="bg-gray-50 p-3 sm:p-4 rounded-lg">
                         <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs sm:text-sm font-medium text-gray-500">{{ $transaksi->product && $transaksi->product->date_received ? date('d M Y', strtotime($transaksi->product->date_received)) : '-' }}</span>
+                            <span class="text-xs sm:text-sm font-medium text-gray-500">{{ $transaksi->created_at ? $transaksi->created_at->format('Y-m-d H:i') : '-' }}</span>
                             @if($transaksi->transaction_type == 'IN')
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">IN</span>
                             @else
                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">OUT</span>
                             @endif
                         </div>
-                        <div class="text-sm font-medium text-gray-900">{{ $transaksi->product ? $transaksi->product->product_name : 'Produk tidak tersedia' }}</div>
+                        <div class="text-sm font-medium text-gray-900">{{ $transaksi->product_name ?? ($transaksi->product ? $transaksi->product->product_name : 'Produk tidak tersedia') }}</div>
                         <div class="text-xs text-gray-500 mb-2">Barcode: {{ $transaksi->barcode ?? '-' }}</div>
                         <div class="flex justify-between items-center">
                             <div class="text-sm font-semibold text-gray-900">
@@ -233,9 +250,9 @@
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse($transaksiTerakhir as $transaksi)
                         <tr class="hover:bg-gray-50 transition-colors duration-200">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $transaksi->product && $transaksi->product->date_received ? date('Y-m-d', strtotime($transaksi->product->date_received)) : '-' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ $transaksi->created_at ? $transaksi->created_at->format('Y-m-d H:i') : '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $transaksi->product ? $transaksi->product->product_name : 'Produk tidak tersedia' }}</div>
+                                <div class="text-sm font-medium text-gray-900">{{ $transaksi->product_name ?? ($transaksi->product ? $transaksi->product->product_name : 'Produk tidak tersedia') }}</div>
                                 <div class="text-sm text-gray-500">{{ $transaksi->barcode ?? '-' }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -273,10 +290,9 @@
                 </table>
             </div>
             <div class="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-t border-gray-200">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3">
-                    <p class="text-xs sm:text-sm text-gray-700">Menampilkan {{ $transaksiTerakhir->count() }} dari {{ $totalTransaksi }} transaksi</p>
+                <div class="flex justify-end">
                     <a href="{{ route('inventory.activity') }}" class="text-xs sm:text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors duration-200 flex items-center justify-center">
-                        <span>Lihat semua</span>
+                        <span>Lihat semua transaksi</span>
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
                         </svg>

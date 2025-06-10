@@ -8,41 +8,39 @@
             <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Log Aktivitas Inventori</h1>
             <p class="text-sm text-gray-600 mt-1">Riwayat semua aktivitas inventori</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-2">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                Export Log
-            </button>
-            <button class="bg-red-600 hover:bg-red-700 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-all duration-200">
-                Clear Old Logs
-            </button>
-        </div>
     </div>
 
     <!-- Filter Section -->
-    <div class="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+    <form action="{{ route('inventory.activity') }}" method="GET" class="bg-white rounded-lg shadow p-3 sm:p-4 mb-4 sm:mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Mulai</label>
-                <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="date" name="start_date" value="{{ request('start_date') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Akhir</label>
-                <input type="date" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="date" name="end_date" value="{{ request('end_date') }}" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Aktivitas</label>
-                <select class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select name="transaction_type" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                     <option value="">Semua Aktivitas</option>
-                    <option value="IN">Barang Masuk</option>
-                    <option value="OUT">Barang Keluar</option>
+                    <option value="IN" {{ request('transaction_type') == 'IN' ? 'selected' : '' }}>Barang Masuk</option>
+                    <option value="OUT" {{ request('transaction_type') == 'OUT' ? 'selected' : '' }}>Barang Keluar</option>
                 </select>
             </div>
             <div class="flex items-end">
-                <button class="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
+                <button type="submit" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all duration-200">
                     Filter
                 </button>
+                @if(request()->hasAny(['start_date', 'end_date', 'transaction_type']))
+                    <a href="{{ route('inventory.activity') }}" class="ml-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-md text-sm font-medium transition-all duration-200">
+                        Reset
+                    </a>
+                @endif
             </div>
         </div>
-    </div>    <!-- Stats Cards -->
+    </form>    <!-- Stats Cards -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-4 sm:mb-6">
         <div class="bg-white rounded-lg shadow p-3 sm:p-4">
             <div class="flex items-center">

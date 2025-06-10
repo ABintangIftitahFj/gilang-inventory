@@ -208,11 +208,25 @@ class TransactionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function activityLog()
+    public function activityLog(Request $request)
     {
-        $activities = Transaction::with('product')
-            ->latest()
-            ->paginate(50);
+        $query = Transaction::with('product')->latest();
+
+        // Filter berdasarkan tanggal
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+        
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
+        // Filter berdasarkan tipe transaksi
+        if ($request->filled('transaction_type')) {
+            $query->where('transaction_type', $request->transaction_type);
+        }
+
+        $activities = $query->paginate(50);
 
         return view('inventory.activity-log', compact('activities'));
     }

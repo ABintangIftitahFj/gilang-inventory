@@ -202,9 +202,20 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function stockLevels()
+    public function stockLevels(Request $request)
     {
-        $products = Product::with('transactions')->get();
+        $query = Product::with('transactions');
+
+        // Filter berdasarkan pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                  ->orWhere('barcode', 'like', "%{$search}%");
+            });
+        }
+
+        $products = $query->get();
 
         // Calculate stock for each product based on transactions
         $products->transform(function ($product) {
@@ -214,7 +225,11 @@ class ProductController extends Controller
             return $product;
         });
 
-        return view('inventory.stock-levels', compact('products'));
+        // Get total transactions count
+        $totalTransaksiMasuk = \App\Models\Transaction::where('transaction_type', 'IN')->count();
+        $totalTransaksiKeluar = \App\Models\Transaction::where('transaction_type', 'OUT')->count();
+
+        return view('inventory.stock-levels', compact('products', 'totalTransaksiMasuk', 'totalTransaksiKeluar'));
     }
 
     /**
